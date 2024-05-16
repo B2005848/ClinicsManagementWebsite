@@ -5,6 +5,7 @@ const { knex, checkconnection } = require("./db.config");
 // Start server
 const PORT = process.env.PORT;
 
+//test connect
 checkconnection().then((connected) => {
   if (connected) {
     app.listen(PORT, () => {
