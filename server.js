@@ -1,6 +1,6 @@
 require("dotenv").config();
 const app = require("./src/app");
-const { knex, checkconnection } = require("./db.config");
+const { checkconnection } = require("./db.config");
 
 // Start server
 const PORT = process.env.PORT;

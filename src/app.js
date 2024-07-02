@@ -1,7 +1,8 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
-const userRouter = require("./Routers/user.route");
-
+const routerAccount = require("./Routers/account.patients.route");
+const routerPatient = require("./Routers/handle.patient.router");
 const {
   resourceNotFound,
   methodNotAllowed,
@@ -16,11 +17,12 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.json({
-    message: "Welcome to my project ",
+    message: "Back end Thực tập thực tế",
   });
 });
 
-app.use("/api/users", userRouter);
+app.use("/api/patient/account", routerAccount);
+app.use("/api/handle/patient", routerPatient);
 
 app.use(resourceNotFound);
 app.use(methodNotAllowed);

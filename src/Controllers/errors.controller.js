@@ -12,7 +12,7 @@ function methodNotAllowed(req, res, next) {
       })
     );
   }
-  return next;
+  return next();
 }
 
 function resourceNotFound(req, res, next) {
@@ -31,4 +31,8 @@ function handleError(error, req, res, next) {
     });
 }
 
-module.exports = { resourceNotFound, methodNotAllowed, handleError };
+module.exports = {
+  methodNotAllowed,
+  resourceNotFound,
+  handleError,
+};
