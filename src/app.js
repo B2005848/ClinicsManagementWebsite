@@ -17,7 +17,7 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.json({
-    message: "Back end Thực tập thực tế",
+    message: "Server CTU final project",
   });
 });
 

@@ -2,10 +2,12 @@ const ApiError = require("../api-error");
 const accountService = require("../Services/account.patients.service");
 
 async function createAccount(req, res, next) {
-  const name = req.body?.name;
+  const first_name = req.body?.first_name;
+  const last_name = req.body?.last_name;
   const username = req.body?.username;
   const password = req.body?.password;
-  if (!name) {
+  let birthday = req.body?.birthday !== undefined ? req.body?.birthday : null;
+  if (!first_name && !last_name) {
     return next(new ApiError(400, "Name is required"));
   }
   if (!username) {
@@ -14,13 +16,20 @@ async function createAccount(req, res, next) {
   if (!password) {
     return next(new ApiError(400, "Password is required"));
   }
+  if (birthday) {
+    //input DD/MM/YYYY
+    const [day, month, year] = birthday.split("/");
+    birthday = `${year}-${month}-${day}`; // convert format to YYYY-MM-DD
+  }
   const accountData = {
-    username: username,
+    patient_id: username,
     password: password,
   };
 
   const patient_detailsData = {
-    name: name,
+    first_name: first_name,
+    last_name: last_name,
+    birthday: birthday,
   };
   const resultCreate_account = await accountService.createAccount(
     accountData,

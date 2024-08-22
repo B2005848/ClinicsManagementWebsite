@@ -5,23 +5,23 @@ async function createAccount(accountData, patient_detailsData) {
   let transaction;
   try {
     transaction = await knex.transaction();
-    accountData.statusAccount = "1";
+    accountData.status = "1";
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     const passwd_hash = await bcrypt.hash(accountData.password, salt);
     accountData.password = passwd_hash;
     accountData.salt = salt;
 
-    // Kiểm tra tài khoản đã tồn tại trong giao dịch
-    const accountExisting = await transaction("patient_account")
-      .where("username", accountData.username)
+    // check account exit?
+    const accountExisting = await transaction("PATIENT_ACCOUNTS")
+      .where("patient_id", accountData.patient_id)
       .first();
 
     if (!accountExisting) {
-      // Chèn tài khoản mới
-      await transaction("patient_account").insert(accountData);
-      patient_detailsData.username = accountData.username;
-      await transaction("patient_details").insert(patient_detailsData);
+      // Add a new account
+      await transaction("PATIENT_ACCOUNTS").insert(accountData);
+      patient_detailsData.patient_id = accountData.patient_id;
+      await transaction("PATIENT_DETAILS").insert(patient_detailsData);
       await transaction.commit();
       console.log("create a patient account success", [accountData]);
       return {
@@ -53,8 +53,8 @@ async function createAccount(accountData, patient_detailsData) {
 
 async function checkLogin(username, password) {
   try {
-    const usernameExisting = await knex("patient_account")
-      .where("username", username)
+    const usernameExisting = await knex("PATIENT_ACCOUNTS")
+      .where("patient_id", username)
       .first();
     if (usernameExisting) {
       const salt = usernameExisting.salt;
