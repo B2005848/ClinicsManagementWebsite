@@ -7,6 +7,7 @@ async function createAccount(req, res, next) {
   const username = req.body?.username;
   const password = req.body?.password;
   let birthday = req.body?.birthday !== undefined ? req.body?.birthday : null;
+  const email = req.body?.email;
 
   if (!first_name && !last_name) {
     return next(new ApiError(400, "Name is required"));
@@ -32,6 +33,7 @@ async function createAccount(req, res, next) {
     last_name: last_name,
     birthday: birthday,
     phone_number: username,
+    email: email,
   };
   const resultCreate_account = await accountService.createAccount(
     accountData,
