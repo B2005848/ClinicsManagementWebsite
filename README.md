@@ -6,7 +6,7 @@
 
 - User account creation and management.
 - Password hashing with `bcrypt`.
-- SMS-based authentication using `Nexmo` (Vonage).
+- Gmail-based authentication using `nodemailer` (Gmail).
 
 ## Technologies Used
 
@@ -30,9 +30,12 @@ Before you begin, ensure you have met the following requirements:
    ```
 
 2. Install the necessary packages:
+
    ```bash
    npm install
+
    ```
+
 3. Create a .env file in the root directory and add the following environment variables:
 
 # SEVER
@@ -47,11 +50,15 @@ DB_USER=
 DB_PASS=
 DB_NAME=
 
+# GMAIL
+
+GMAIL_USER='your email'
+GMAIL_PASS='your app passowrd in gg email'
+
 ## Acknowledgements
 
 - Node.js
 - Express.js
-- Nexmo (Vonage)
 - bcrypt
 
 # Copyright (c) 2024 LeThanhNamCTUB2005848. All rights reserved.
