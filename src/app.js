@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
-const otpRoutes = require("./Routers/email.router");
+const emailRoutes = require("./Routers/email.router");
 const routerAccount = require("./Routers/account.patients.route");
 const routerPatient = require("./Routers/handle.patient.router");
 const {
@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
 app.use("/api/patient/account", routerAccount);
 app.use("/api/handle/patient", routerPatient);
 
-app.use("/api/otp", otpRoutes);
+app.use("/api/email", emailRoutes);
 
 app.use(resourceNotFound);
 app.use(methodNotAllowed);

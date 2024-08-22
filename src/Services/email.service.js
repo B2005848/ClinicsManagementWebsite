@@ -1,4 +1,6 @@
 // src/services/email-service.js
+const { knex } = require("../../db.config");
+
 const nodemailer = require("nodemailer");
 const path = require("path");
 // Cấu hình Gmail SMTP
@@ -22,6 +24,7 @@ async function sendOTPEmail(to, otp) {
     <html>
       <body>
         <h1>Your OTP Code</h1>
+        <p>Thank you for using our sevice</p>
         <p>Your OTP code is <strong>${otp}</strong></p>
         <img src="cid:unique@kreata.ee" alt="OTP Image" style="max-width: 100%; height: auto;" />
       </body>
