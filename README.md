@@ -49,4 +49,4 @@ DB_NAME=
 - Express.js
 - Nexmo (Vonage)
 - bcrypt
-Copyright (c) 2024 [LeThanhNamCTU]. All rights reserved.
+# Copyright (c) 2024 LeThanhNamCTUB2005848. All rights reserved.
