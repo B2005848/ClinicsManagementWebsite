@@ -60,5 +60,6 @@ GMAIL_PASS='your app passowrd in gg email'
 - Node.js
 - Express.js
 - bcrypt
+- nodemailer
 
 # Copyright (c) 2024 LeThanhNamCTUB2005848. All rights reserved.
