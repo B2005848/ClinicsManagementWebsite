@@ -1,28 +1,5 @@
 const bcrypt = require("bcryptjs");
 const { knex } = require("../../db.config");
-const { Vonage } = require("@vonage/server-sdk");
-
-const vonage = new Vonage({
-  apiKey: process.env.VONAGE_API_KEY,
-  apiSecret: process.env.VONAGE_API_SECRET,
-});
-
-async function sendOTP(phoneNumber, otp) {
-  const from = "Vonage APIs"; // Thay đổi theo tên bạn đã cấu hình
-  const text = `Your verification code is ${otp}`;
-
-  try {
-    const response = await vonage.sms.send({ to: phoneNumber, from, text });
-    if (response.messages[0].status !== "0") {
-      throw new Error(
-        `Failed to send SMS: ${response.messages[0]["error-text"]}`
-      );
-    }
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-}
 
 async function createAccount(accountData, patient_detailsData) {
   let transaction;
@@ -98,5 +75,4 @@ async function checkLogin(username, password) {
 module.exports = {
   createAccount,
   checkLogin,
-  sendOTP,
 };
