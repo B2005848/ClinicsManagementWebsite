@@ -12,6 +12,13 @@ const {
 // create app use express
 const app = express();
 
+// app.use(
+//   cors({
+//     origin: ["http://localhost:8080", "http://10.1.44.233"],
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     credentials: true, // Hỗ trợ cookie nếu cần
+//   })
+// );
 app.use(cors());
 
 app.use(express.json());
