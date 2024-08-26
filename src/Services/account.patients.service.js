@@ -1,5 +1,7 @@
 const bcrypt = require("bcryptjs");
 const { knex } = require("../../db.config");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 async function createAccount(accountData, patient_detailsData) {
   let transaction;
@@ -61,7 +63,18 @@ async function checkLogin(username, password) {
       const passwd_hash = await bcrypt.hash(password, salt);
       if (passwd_hash == usernameExisting.password) {
         console.log(`Login success with username: ${username}`);
-        return true;
+        const token = jwt.sign(
+          {
+            patient_id: usernameExisting.patient_id,
+            username: usernameExisting.status,
+          },
+          process.env.JWT_SECRET,
+          {
+            // expiresIn 3 day
+            expiresIn: "72h",
+          }
+        );
+        return { success: true, token: token };
       } else {
         console.log(`Incorrect password for username: ${username}`);
         return false;

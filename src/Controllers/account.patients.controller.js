@@ -63,6 +63,7 @@ async function checkLogin(req, res, next) {
   if (resultCheckLogin) {
     return res.status(200).json({
       message: "Login successful",
+      token: resultCheckLogin.token,
     });
   } else {
     return next(new ApiError(400, "Invalid username or password"));
