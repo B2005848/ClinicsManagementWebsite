@@ -5,7 +5,7 @@ const handlePatientService = require("../Services/handle.patient.service");
 async function getALL_patients(req, res, next) {
   try {
     const page = parseInt(req.query.page) || 1;
-    const { patients, totalPages } = await handlePatientService.getALL_patients(
+    const { patients, totalPages } = await handlePatientService.getAllPatients(
       page
     );
     res.status(200).json({ patients, totalPages });

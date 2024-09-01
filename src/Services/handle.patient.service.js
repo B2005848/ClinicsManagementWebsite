@@ -1,7 +1,7 @@
 const { knex } = require("../../db.config");
 
 // ------------------Get all list patient---------------------
-async function getALL_patients(page) {
+async function getAllPatients(page) {
   try {
     const itemsPerPage = 10;
     const offset = (page - 1) * itemsPerPage;
@@ -92,6 +92,6 @@ async function addPatient(data) {
 
 module.exports = {
   getDATA_patientBy_username,
-  getALL_patients,
+  getAllPatients,
   addPatient,
 };

@@ -1,7 +1,7 @@
 const express = require("express");
-const accountController = require("../Controllers/account.patients.controller");
+const accountPatientControllers = require("../Controllers/account.patients.controller");
 const router = express.Router();
 
-router.post("/create", accountController.createAccount);
-router.post("/login", accountController.checkLogin);
+router.post("/create", accountPatientControllers.createAccount);
+router.post("/login", accountPatientControllers.checkLogin);
 module.exports = router;

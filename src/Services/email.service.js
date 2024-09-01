@@ -34,6 +34,7 @@ async function sendOTPEmail(to, otp) {
       {
         filename: "image.jpg",
         path: path.join(__dirname, "../../images/HealthFirst.png"),
+        // id'src image to src = id
         cid: "unique@kreata.ee",
       },
     ],
