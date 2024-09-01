@@ -59,6 +59,15 @@ const accountPatientServices = {
     }
   },
 
+  async deleteAccount(username, password, email) {
+    try {
+      // get account data
+      const accountData = await transaction("PATIENT_ACCOUNTS")
+        .where("username", username)
+        .where("password", password);
+    } catch (error) {}
+  },
+
   async checkLogin(username, password) {
     try {
       const usernameExisting = await knex("PATIENT_ACCOUNTS")
