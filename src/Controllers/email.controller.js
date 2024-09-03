@@ -36,21 +36,20 @@ const emailControllers = {
     try {
       const response = await emailService.checkOtpByPatientId(patient_id, otp);
 
+      // success == true
       if (response.success) {
-        // OTP xác minh thành công
         return res.status(200).json({
           status: true,
           message: response.message,
         });
       } else {
-        // Xác minh OTP không thành công, phân loại lỗi cụ thể hơn
+        // success == false
         if (!response.success) {
           return res.status(400).json({
             status: false,
-            message: response.message, // Trả về thông báo lỗi cụ thể hơn
+            message: response.message,
           });
         } else {
-          // Các lỗi khác (nếu có)
           return res.status(500).json({
             status: false,
             message: "An error occurred while verifying OTP",
@@ -59,7 +58,6 @@ const emailControllers = {
         }
       }
     } catch (error) {
-      // Bắt các lỗi không mong muốn trong quá trình thực hiện
       console.error("Error in checkOtpController:", error);
       return res.status(500).json({
         status: false,
