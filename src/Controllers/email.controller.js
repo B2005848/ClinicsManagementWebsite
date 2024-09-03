@@ -40,7 +40,7 @@ const emailControllers = {
         // OTP xác minh thành công
         return res.status(200).json({
           status: true,
-          message: "OTP verified successfully",
+          message: response.message,
         });
       } else {
         // Xác minh OTP không thành công, phân loại lỗi cụ thể hơn

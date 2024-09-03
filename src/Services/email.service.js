@@ -58,7 +58,7 @@ const emailService = {
             email: to,
             otp: otp,
             // set exp in 20 seconds
-            expires_in_seconds: 300,
+            expires_in_seconds: 1,
           });
           if (resultSaveOtp) {
             console.log("OTP saved successfully");
@@ -142,22 +142,22 @@ const emailService = {
         t2.isAfter(t1)
       );
 
-      /* ---------------------------------------------PAST TIME -------------------------CURRENT TIME---------------------------FUTURE TIME
+      /* -------------------------------------PAST TIME(expiration time)------------------CURRENT TIME----------------------FUTURE TIME(expiration time)
       |------------------------------------------------|---------------------------------------|---------------------------------------|-----
-      |-----------------------------------------2024-09-03 20:55:57------------------2024-09-03 20:56:04.369------------------------and then|
+      |-----------------------------------------2024-09-03 21:30:46.123------------------2024-09-03 21:30:57.557---------------2024-09-03 21:34:15.863|
       */
       // check expirationTime is after? if expirationTime is not after become, (currentTimeLocal.isAfter(expirationTime)) will reuturn false
-      // after become: 11:00 is after become 11:01, 12:00.......
+      // T2 is living in future? yes --> true
       if (t2.isAfter(t1)) {
         return {
           success: true,
-          message: "OTP has expired",
+          message: "OTP is correct and not expired",
         };
       } else {
         return {
           // success is false: expirationTime is after currentTimeLocal
           success: false,
-          message: "OTP is correct and not expired",
+          message: "OTP has expired",
         };
       }
     } catch (error) {
