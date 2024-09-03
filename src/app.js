@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
 app.use("/api/patient/account", routerAccount);
 app.use("/api/handle/patient", routerPatient);
 
-app.use("/api/email", emailRoutes);
+app.use("/api/patient/email", emailRoutes);
 
 app.use(resourceNotFound);
 app.use(methodNotAllowed);
