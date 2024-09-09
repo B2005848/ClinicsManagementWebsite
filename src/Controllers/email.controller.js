@@ -11,6 +11,8 @@ const emailControllers = {
         .json({ status: false, message: "Email is required" });
     }
 
+    //Math.random(): x --> 0.0 <= x < 1
+    // 100.000 <= otp <= 999.999
     const otp = Math.floor(100000 + Math.random() * 900000);
 
     const response = await emailService.sendOTPEmailPatient(email, otp);

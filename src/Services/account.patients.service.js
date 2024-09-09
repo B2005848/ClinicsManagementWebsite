@@ -45,7 +45,6 @@ const accountPatientServices = {
         return {
           status: false,
           message: "create a patient account fail: account already exists",
-          data: [accountData],
         };
       }
     } catch (error) {

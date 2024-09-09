@@ -57,8 +57,8 @@ const emailService = {
             patient_id: patient.patient_id,
             email: to,
             otp: otp,
-            // set exp in 20 seconds
-            expires_in_seconds: 1,
+            // set exp in 300 seconds = 5 minutes
+            expires_in_seconds: 300,
           });
           if (resultSaveOtp) {
             console.log("OTP saved successfully");
@@ -137,10 +137,6 @@ const emailService = {
       const t1 = moment(currentTimeLocal.format("YYYY-MM-DD HH:mm:ss.SSS"));
       // t2 is expirationTime
       const t2 = moment(expirationTime.format("YYYY-MM-DD HH:mm:ss.SSS"));
-      console.log(
-        "Otp is expired(false is No or true is Yes) ",
-        t2.isAfter(t1)
-      );
 
       /* -------------------------------------PAST TIME(expiration time)------------------CURRENT TIME----------------------FUTURE TIME(expiration time)
       |------------------------------------------------|---------------------------------------|---------------------------------------|-----
@@ -149,11 +145,13 @@ const emailService = {
       // check expirationTime is after? if expirationTime is not after become, (currentTimeLocal.isAfter(expirationTime)) will reuturn false
       // T2 is living in future? yes --> true
       if (t2.isAfter(t1)) {
+        console.log("OTP is correct and not expired");
         return {
           success: true,
           message: "OTP is correct and not expired",
         };
       } else {
+        console.log("OTP has expired");
         return {
           // success is false: expirationTime is after currentTimeLocal
           success: false,

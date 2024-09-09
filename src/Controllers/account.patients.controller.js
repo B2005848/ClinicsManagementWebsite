@@ -40,7 +40,7 @@ const accountPatientControllers = {
       accountData,
       patient_detailsData
     );
-    if (resultCreate_account) {
+    if (resultCreate_account.status === true) {
       return res.status(201).json({
         message: "An account created",
         data: resultCreate_account.data,
