@@ -15,12 +15,10 @@ async function getALL_patients(req, res, next) {
 }
 
 // ---------------Get information patient data by username of them----------------
-async function getDATA_patientBy_username(req, res, next) {
+async function getPatientByUsername(req, res, next) {
   try {
     const username = req.params.username;
-    const data = await handlePatientService.getDATA_patientBy_username(
-      username
-    );
+    const data = await handlePatientService.getPatientByUsername(username);
     if (data) {
       return res.status(200).json({
         status: 200,
@@ -94,7 +92,7 @@ async function addNew_patient(req, res, next) {
 }
 
 module.exports = {
-  getDATA_patientBy_username,
+  getPatientByUsername,
   getALL_patients,
   addNew_patient,
 };

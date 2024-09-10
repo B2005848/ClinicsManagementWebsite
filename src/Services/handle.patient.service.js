@@ -7,7 +7,7 @@ async function getAllPatients(page) {
     const offset = (page - 1) * itemsPerPage;
 
     // Get quantity patients
-    const totalPatients = await knex("patient_details")
+    const totalPatients = await knex("PATIENT_ACCOUNTS")
       .count("* as totalCount")
       .first();
     const totalItems = totalPatients.totalCount;
@@ -16,17 +16,7 @@ async function getAllPatients(page) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     // get list patient by position page
-    const patients = await knex("patient_details")
-      .select(
-        "patient_details.*",
-        "patient_account.registration_date",
-        "patient_account.statusAccount"
-      )
-      .join(
-        "patient_account",
-        "patient_account.username",
-        "patient_details.username"
-      )
+    const patients = await knex("PATIENT_ACCOUNTS")
       .limit(itemsPerPage)
       .offset(offset);
     if (patients) {
@@ -39,20 +29,10 @@ async function getAllPatients(page) {
 }
 
 // ---------------Get information patient data by username of them----------------
-async function getDATA_patientBy_username(username) {
+async function getPatientByUsername(patient_id) {
   try {
-    const data = await knex("patient_details")
-      .select(
-        "patient_details.*",
-        "patient_account.registration_date",
-        "patient_account.statusAccount"
-      )
-      .join(
-        "patient_account",
-        "patient_account.username",
-        "patient_details.username"
-      )
-      .where("patient_details.username", username)
+    const data = await knex("PATIENT_DETAILS")
+      .where("patient_id", patient_id)
       .first();
     if (data) {
       return data;
@@ -91,7 +71,7 @@ async function addPatient(data) {
 }
 
 module.exports = {
-  getDATA_patientBy_username,
+  getPatientByUsername,
   getAllPatients,
   addPatient,
 };
