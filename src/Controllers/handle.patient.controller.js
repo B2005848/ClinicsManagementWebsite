@@ -69,6 +69,7 @@ const handlePatientController = {
       const resultUpdateInformation =
         await handlePatientService.updateInformation(patient_id, data);
       if (resultUpdateInformation) {
+        console.log(`update information patient id: ${patient_id} success`);
         return res.status(200).json({
           message: "Update information successful",
           data: data,
