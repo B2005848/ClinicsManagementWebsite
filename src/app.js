@@ -31,7 +31,6 @@ app.get("/", (req, res) => {
 
 app.use("/api/patient/account", routerAccount);
 app.use("/api/handle/patient", routerPatient);
-
 app.use("/api/patient/email", emailRoutes);
 
 app.use(resourceNotFound);

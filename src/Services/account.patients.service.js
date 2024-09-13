@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const accountPatientServices = {
-  // function createAccount of patient
+  // -------------------------------------------------------------CREATE ACCOUNT SERVICE----------------------------------------------
   async createAccount(accountData, patient_detailsData) {
     let transaction;
     try {
@@ -58,15 +58,7 @@ const accountPatientServices = {
     }
   },
 
-  async deleteAccount(username, password, email) {
-    try {
-      // get account data
-      const accountData = await transaction("PATIENT_ACCOUNTS")
-        .where("username", username)
-        .where("password", password);
-    } catch (error) {}
-  },
-
+  // ---------------------------------------------------------------LOGIN SERVICE----------------------------------------------------------
   async checkLogin(username, password) {
     try {
       const usernameExisting = await knex("PATIENT_ACCOUNTS")

@@ -1,77 +1,86 @@
 const { knex } = require("../../db.config");
 
-// ------------------Get all list patient---------------------
-async function getAllPatients(page) {
-  try {
-    const itemsPerPage = 10;
-    const offset = (page - 1) * itemsPerPage;
+const handlePatientService = {
+  // ------------------GET LIST ACCOUNT OF ALL PATIENTS---------------------
+  async getListAccountPatients(page) {
+    try {
+      const itemsPerPage = 10;
+      const offset = (page - 1) * itemsPerPage;
 
-    // Get quantity patients
-    const totalPatients = await knex("PATIENT_ACCOUNTS")
-      .count("* as totalCount")
-      .first();
-    const totalItems = totalPatients.totalCount;
+      // Get quantity patients
+      const totalPatients = await knex("PATIENT_ACCOUNTS")
+        .count("* as totalCount")
+        .first();
+      const totalItems = totalPatients.totalCount;
 
-    // Calculate quantity page
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+      // Calculate quantity page
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-    // get list patient by position page
-    const patients = await knex("PATIENT_ACCOUNTS")
-      .limit(itemsPerPage)
-      .offset(offset);
-    if (patients) {
-      return { patients, totalPages };
+      // get list patient by position page
+      const patients = await knex("PATIENT_ACCOUNTS")
+        .limit(itemsPerPage)
+        .offset(offset);
+      if (patients) {
+        return { patients, totalPages };
+      }
+    } catch (error) {
+      console.error("Error retrieving patients:", error);
+      throw error;
     }
-  } catch (error) {
-    console.error("Error retrieving patients:", error);
-    throw error;
-  }
-}
+  },
 
-// ---------------Get information patient data by username of them----------------
-async function getPatientByUsername(patient_id) {
-  try {
-    const data = await knex("PATIENT_DETAILS")
-      .where("patient_id", patient_id)
-      .first();
-    if (data) {
-      return data;
-    } else {
+  // ---------------GET INFORMATION OF PATIENT WITH PATIENT ID----------------
+  async getPatientByUsername(patient_id) {
+    try {
+      const data = await knex("PATIENT_DETAILS")
+        .where("patient_id", patient_id)
+        .first();
+      if (data) {
+        return data;
+      } else {
+        return {
+          status: false,
+          message: "Patient Details Not Found",
+        };
+      }
+    } catch (error) {
       return {
         status: false,
-        message: "Patient Details Not Found",
+        message: "Error Occured get data of patient",
+        error: error.message,
       };
     }
-  } catch (error) {
-    return {
-      status: false,
-      message: "Error Occured get data of patient",
-      error: error.message,
-    };
-  }
-}
+  },
 
-// ------------------------Add a new patient-----------------------
-async function addPatient(data) {
-  try {
-    const patient = await knex("patient_details").insert(data);
-
-    if (patient) {
-      return {
-        status: true,
-        message: "Patient Added Successfully",
-        data: patient,
-      };
-    } else {
-      return { status: false, message: "Error Occured" };
+  // -----------UPDATE INFORMATION DETAIL-------------------------------------
+  async updateInformation(patient_id, data) {
+    try {
+      const patientIdExiting = await knex("PATIENT_DETAILS")
+        .where("patient_id", patient_id)
+        .first();
+      if (patientIdExiting) {
+        const updatedPatient = await knex("PATIENT_DETAILS")
+          .where("patient_id", patient_id)
+          .update(data);
+        if (updatedPatient) {
+          return {
+            success: true,
+            message: "Account information updated successfully",
+          };
+        } else {
+          return {
+            success: false,
+            message: "Failed to update account information",
+          };
+        }
+      } else {
+        return { success: false, message: "Patient ID not found" };
+      }
+    } catch (error) {
+      console.error("Error during update account info:", error);
+      throw error;
     }
-  } catch (error) {
-    return { status: false, message: "Error Occured", error: error.message };
-  }
-}
-
-module.exports = {
-  getPatientByUsername,
-  getAllPatients,
-  addPatient,
+  },
 };
+
+module.exports = handlePatientService;

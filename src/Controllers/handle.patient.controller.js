@@ -1,98 +1,90 @@
 const ApiError = require("../api-error");
 const handlePatientService = require("../Services/handle.patient.service");
+const moment = require("moment");
 
-// ------------------Get all list patient---------------------
-async function getALL_patients(req, res, next) {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const { patients, totalPages } = await handlePatientService.getAllPatients(
-      page
-    );
-    res.status(200).json({ patients, totalPages });
-  } catch (error) {
-    next(new ApiError(400, "get all patient fail!"));
-  }
-}
-
-// ---------------Get information patient data by username of them----------------
-async function getPatientByUsername(req, res, next) {
-  try {
-    const username = req.params.username;
-    const data = await handlePatientService.getPatientByUsername(username);
-    if (data) {
-      return res.status(200).json({
-        status: 200,
-        message: "get data patient success",
-        dataInfo: data,
-      });
+const handlePatientController = {
+  // ------------------GET LIST ACCOUNT OF ALL PATIENTS---------------------
+  async getListAccountPatients(req, res, next) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const { patients, totalPages } =
+        await handlePatientService.getListPatients(page);
+      res.status(200).json({ patients, totalPages });
+    } catch (error) {
+      next(new ApiError(400, "get all patient fail!"));
     }
-  } catch (error) {
-    next(new ApiError(404, "patient not exist!"));
-  }
-}
+  },
 
-// ----------------------Add a new patient-----------------
-// ----------------------Add a new patient-----------------
-async function addNew_patient(req, res, next) {
-  try {
-    // Destructure and validate required fields
-    const {
-      username,
-      name,
-      birth_year,
-      gender,
-      contact_addrees,
-      phone_number,
-      email,
-    } = req.body;
-
-    if (
-      !username ||
-      !name ||
-      !birth_year ||
-      !gender ||
-      !contact_addrees ||
-      !phone_number ||
-      !email
-    ) {
-      return res.status(400).json({
-        status: 400,
-        message: "Missing required fields",
-      });
+  // ---------------GET INFORMATION OF PATIENT WITH PATIENT ID----------------
+  async getPatientByUsername(req, res, next) {
+    try {
+      const username = req.params.username;
+      const data = await handlePatientService.getPatientByUsername(username);
+      if (data) {
+        return res.status(200).json({
+          status: 200,
+          message: "get data patient success",
+          dataInfo: data,
+        });
+      }
+    } catch (error) {
+      next(new ApiError(404, "patient not exist!"));
     }
+  },
 
-    const dataInfo = {
-      username,
-      name,
-      birth_year,
-      gender,
-      contact_addrees,
-      phone_number,
-      email,
-    };
+  // ------------------------------------------------UPATE INFORMATION DETAIL CONTROLLER------------------------------
+  async updateInformation(req, res, next) {
+    try {
+      const patient_id = req.params.id;
+      const {
+        first_name,
+        last_name,
+        birthday,
+        citizen_id,
+        gender,
+        phone_number,
+        major,
+        email,
+        address_contact,
+        health_insurance_id,
+      } = req.body;
 
-    const data = await handlePatientService.addPatient(dataInfo);
+      // format birthday
+      const formattedBirthday = moment(birthday, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      );
 
-    if (data) {
-      return res.status(200).json({
-        status: 200,
-        message: "Add new patient success",
-        dataInfo: data,
-      });
-    } else {
-      return res.status(400).json({
-        status: 400,
-        message: "Add new patient fail",
-      });
+      const data = {
+        first_name,
+        last_name,
+        birthday: formattedBirthday,
+        citizen_id,
+        gender,
+        phone_number,
+        major,
+        email,
+        address_contact,
+        health_insurance_id,
+      };
+      const resultUpdateInformation =
+        await handlePatientService.updateInformation(patient_id, data);
+      if (resultUpdateInformation) {
+        return res.status(200).json({
+          message: "Update information successful",
+          data: data,
+        });
+      } else {
+        return next(new ApiError(400, "Update information failed"));
+      }
+    } catch (error) {
+      return next(
+        new ApiError(
+          500,
+          `An error occurred while update information with patient_id: ${patient_id}`
+        )
+      );
     }
-  } catch (error) {
-    console.error("Error adding new patient:", error);
-    next(new ApiError(500, "An error occurred while adding new patient"));
-  }
-}
-
-module.exports = {
-  getPatientByUsername,
-  getALL_patients,
-  addNew_patient,
+  },
 };
+
+module.exports = handlePatientController;
