@@ -15,13 +15,25 @@ const handlePatientService = {
 
       // Calculate quantity page
       const totalPages = Math.ceil(totalItems / itemsPerPage);
-
+      if (page > totalPages) {
+        return {
+          status: false,
+          message: `Page ${page} exceeds total number of pages (${totalPages}). No patient available.`,
+          totalPages,
+          patients: [],
+        };
+      }
       // get list patient by position page
       const patients = await knex("PATIENT_ACCOUNTS")
         .limit(itemsPerPage)
         .offset(offset);
       if (patients) {
-        return { patients, totalPages };
+        return {
+          status: true,
+          message: "Get list patient successfully",
+          patients,
+          totalPages,
+        };
       }
     } catch (error) {
       console.error("Error retrieving patients:", error);
