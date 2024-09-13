@@ -4,6 +4,8 @@ const cors = require("cors");
 const emailRoutes = require("./Routers/email.router");
 const routerAccount = require("./Routers/account.patients.route");
 const routerPatient = require("./Routers/handle.patient.router");
+
+const routerStaff = require("./Routers/handle.staff.route");
 const {
   resourceNotFound,
   methodNotAllowed,
@@ -28,10 +30,13 @@ app.get("/", (req, res) => {
     message: "Server CTU final project",
   });
 });
-
+// ----------------------------API FOR PATIENTS----------------
 app.use("/api/patient/account", routerAccount);
 app.use("/api/handle/patient", routerPatient);
 app.use("/api/patient/email", emailRoutes);
+
+// --------------------API FOR STAFFS---------------------
+app.use("/api/staff", routerStaff);
 
 app.use(resourceNotFound);
 app.use(methodNotAllowed);

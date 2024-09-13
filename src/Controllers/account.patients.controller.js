@@ -89,7 +89,7 @@ const accountPatientControllers = {
       const status = req.body.status;
       const resultUpdateStatus =
         await accountPatientServices.updateStatusAccount(patient_id, status);
-      if (resultUpdateStatus.status === true) {
+      if (resultUpdateStatus.success === true) {
         return res.status(200).json({
           message: "Status updated",
           data: resultUpdateStatus.data,
