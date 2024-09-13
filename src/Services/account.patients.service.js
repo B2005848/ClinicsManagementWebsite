@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const accountPatientServices = {
-  // -------------------------------------------------------------CREATE ACCOUNT SERVICE----------------------------------------------
+  // ---------------------------------CREATE ACCOUNT SERVICE----------------------------------------------
   async createAccount(accountData, patient_detailsData) {
     let transaction;
     try {
@@ -35,7 +35,7 @@ const accountPatientServices = {
         return {
           status: true,
           message: "create a patient account success",
-          data: [accountData],
+          data: accountData.patient_id,
         };
       } else {
         await transaction.rollback();
@@ -58,7 +58,7 @@ const accountPatientServices = {
     }
   },
 
-  // ---------------------------------------------------------------LOGIN SERVICE----------------------------------------------------------
+  // ----------------------------------LOGIN SERVICE----------------------------------------------------------
   async checkLogin(username, password) {
     try {
       const usernameExisting = await knex("PATIENT_ACCOUNTS")
@@ -91,6 +91,23 @@ const accountPatientServices = {
       }
     } catch (error) {
       console.error("Error during login check:", error);
+      throw error;
+    }
+  },
+
+  // ------------------------------UPDATE STATUS ACCOUNT-----------------------------------------
+  async updateStatusAccount(patient_id, status_id) {
+    try {
+      const result = await knex("PATIENT_ACCOUNTS")
+        .where("patient_id", patient_id)
+        .update("status", status_id);
+      if (result) {
+        return { success: true, message: "Status updated successfully" };
+      } else {
+        return { success: false, message: "Failed to update status" };
+      }
+    } catch (error) {
+      console.error("Error during update status account:", error);
       throw error;
     }
   },
