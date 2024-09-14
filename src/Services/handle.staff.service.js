@@ -78,8 +78,10 @@ const handleStaffService = {
         };
       }
       // Get staff list by position page
-      const staffList = await knex("STAFF_ACCOUNTS")
-        .orderBy("staff_id", "asc")
+      const staffList = await knex("STAFF_ACCOUNTS as sa")
+        .select("sa.*", "sd.first_name", "sd.last_name", "sd.citizen_id")
+        .join("STAFF_DETAILS as sd", "sd.staff_id", "sa.staff_id")
+        .orderBy("sa.staff_id", "asc")
         .limit(itemsPerPage)
         .offset(offset);
       if (

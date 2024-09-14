@@ -24,8 +24,15 @@ const handlePatientService = {
         };
       }
       // get list patient by position page
-      const patients = await knex("PATIENT_ACCOUNTS")
-        .orderBy("patient_id", "asc")
+      const patients = await knex("PATIENT_ACCOUNTS as pa")
+        .select(
+          "pa.*",
+          "pd.first_name as firstname",
+          "pd.last_name",
+          "pd.citizen_id"
+        )
+        .join("PATIENT_DETAILS as pd", "pd.patient_id", "pa.patient_id")
+        .orderBy("pa.patient_id", "asc")
         .limit(itemsPerPage)
         .offset(offset);
       if (patients) {
