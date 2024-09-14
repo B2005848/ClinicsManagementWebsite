@@ -79,7 +79,13 @@ const handleStaffService = {
       }
       // Get staff list by position page
       const staffList = await knex("STAFF_ACCOUNTS as sa")
-        .select("sa.*", "sd.first_name", "sd.last_name", "sd.citizen_id")
+        .select(
+          "sa.*",
+          "sd.first_name",
+          "sd.last_name",
+          "sd.email",
+          "sd.citizen_id"
+        )
         .join("STAFF_DETAILS as sd", "sd.staff_id", "sa.staff_id")
         .orderBy("sa.staff_id", "asc")
         .limit(itemsPerPage)
@@ -142,6 +148,8 @@ const handleStaffService = {
       throw error;
     }
   },
+
+  //------------------- SEARCH STAFF BY NAME, EMAIL, STAFF_ID--------------------
 };
 
 module.exports = handleStaffService;

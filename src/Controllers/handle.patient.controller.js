@@ -1,3 +1,4 @@
+const e = require("express");
 const ApiError = require("../api-error");
 const handlePatientService = require("../Services/handle.patient.service");
 const moment = require("moment");
@@ -83,6 +84,27 @@ const handlePatientController = {
           500,
           `An error occurred while update information with patient_id: ${patient_id}`
         )
+      );
+    }
+  },
+  // --------------------- SEARCH PATIENTS-------------------
+  async searchPatients(req, res, next) {
+    try {
+      const query = req.query.q;
+      const resultSearch = await handlePatientService.searchPatients(query);
+      if (resultSearch.success === true) {
+        return res.status(200).json({
+          message: "Search patients successful",
+          data: resultSearch.data,
+        });
+      } else {
+        return res
+          .status(404)
+          .json({ message: "Not found any patient with this information" });
+      }
+    } catch (error) {
+      return next(
+        new ApiError(500, "An error occurred while searching patients")
       );
     }
   },

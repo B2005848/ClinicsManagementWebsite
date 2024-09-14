@@ -101,6 +101,44 @@ const handlePatientService = {
       throw error;
     }
   },
+
+  // --------------------- SEARCH PATIENTS-------------------
+  async searchPatients(query) {
+    try {
+      const patients = await knex("PATIENT_ACCOUNTS as pa")
+        .select(
+          "pa.*",
+          "pd.first_name as firstname",
+          "pd.last_name",
+          "pd.citizen_id"
+        )
+        .join("PATIENT_DETAILS as pd", "pa.patient_id", "pd.patient_id")
+        .where("pa.patient_id", "like", `%${query}%`)
+        .orWhere("pd.first_name", "like", `%${query}%`)
+        .orWhere("pd.last_name", "like", `%${query}%`)
+        .orWhere("pd.citizen_id", "like", `%${query}%`)
+        .orderBy("pa.patient_id", "asc");
+      if (patients.length > 0) {
+        return {
+          success: true,
+          message: "Patient found",
+          data: patients,
+        };
+      } else {
+        return {
+          success: false,
+          message: "Patient not found",
+        };
+      }
+    } catch (error) {
+      console.error("Error during search patients:", error);
+      return {
+        status: false,
+        message: "An error occurred while searching patients",
+        error: error.message,
+      };
+    }
+  },
 };
 
 module.exports = handlePatientService;

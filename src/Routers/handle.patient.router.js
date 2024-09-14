@@ -16,4 +16,7 @@ router.put(
   "/information/update/:id",
   handlePatientController.updateInformation
 );
+
+//================ SEARCH PATIENT====================
+router.get("/search", handlePatientController.searchPatients);
 module.exports = router;
