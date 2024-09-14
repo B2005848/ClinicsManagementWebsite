@@ -42,8 +42,11 @@ app.use("/api/patient/email", emailRoutes);
 // --------------------API FOR STAFFS---------------------
 app.use("/api/staff", routerStaff);
 
-//---------------------API FOR APPOINTMENT----------------
+//---------------------API FOR APPOINTMENTS----------------
 app.use("/api/appointment", routerBooking);
+
+//----------------------API FOR DEPARTMENTS--------------
+app.use("/api/departments", require("./Routers/handle.department.route"));
 
 app.use(resourceNotFound);
 app.use(methodNotAllowed);

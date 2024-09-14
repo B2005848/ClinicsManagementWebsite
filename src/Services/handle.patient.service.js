@@ -7,7 +7,7 @@ const handlePatientService = {
       const itemsPerPage = 10;
       const offset = (page - 1) * itemsPerPage;
 
-      // Get quantity patients
+      // Get total quantity patients
       const totalPatients = await knex("PATIENT_ACCOUNTS")
         .count("* as totalCount")
         .first();
@@ -25,6 +25,7 @@ const handlePatientService = {
       }
       // get list patient by position page
       const patients = await knex("PATIENT_ACCOUNTS")
+        .orderBy("patient_id", "asc")
         .limit(itemsPerPage)
         .offset(offset);
       if (patients) {
