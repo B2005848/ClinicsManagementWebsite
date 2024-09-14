@@ -1,6 +1,7 @@
 const ApiError = require("../api-error");
 const accountPatientServices = require("../Services/account.patients.service");
 const moment = require("moment");
+
 const accountPatientControllers = {
   async createAccount(req, res, next) {
     try {
@@ -9,8 +10,6 @@ const accountPatientControllers = {
       const username = req.body?.username;
       const password = req.body?.password;
       const email = req.body?.email;
-      let birthday =
-        req.body?.birthday !== undefined ? req.body?.birthday : null;
 
       if (!first_name && !last_name) {
         return next(new ApiError(400, "Name is required"));
@@ -21,6 +20,8 @@ const accountPatientControllers = {
       if (!password) {
         return next(new ApiError(400, "Password is required"));
       }
+      let birthday =
+        req.body?.birthday !== undefined ? req.body?.birthday : null;
       if (birthday) {
         //input DD/MM/YYYY
         birthday = moment(birthday, "DD/MM/YYYY").format("YYYY-MM-DD");

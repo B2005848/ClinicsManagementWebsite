@@ -9,7 +9,7 @@ const accountPatientServices = {
     let transaction;
     try {
       transaction = await knex.transaction();
-      // status= 1: account active
+      // status = 1: account active, 2: temporarily locked, 3: Stop working
       accountData.status = "1";
       const saltRounds = 10;
       const salt = await bcrypt.genSalt(saltRounds);
@@ -31,7 +31,7 @@ const accountPatientServices = {
         await transaction("PATIENT_DETAILS").insert(patient_detailsData);
         // done commit transaction
         await transaction.commit();
-        console.log("create a patient account success", [accountData]);
+        console.log("create a patient account success", [patient_detailsData]);
         return {
           status: true,
           message: "create a patient account success",
