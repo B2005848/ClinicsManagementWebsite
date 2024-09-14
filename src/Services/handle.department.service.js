@@ -77,6 +77,74 @@ const handleDepartment = {
       throw error;
     }
   },
+
+  // -------------------------- DELETE A DEPARTMENT------------------------------------
+  async deleteDepartment(departmentId) {
+    try {
+      // Check if department exists
+      const existingDepartment = await knex("DEPARTMENTS")
+        .where("department_id", departmentId)
+        .first();
+      if (!existingDepartment) {
+        return {
+          status: false,
+          message: "Department not found",
+        };
+      }
+      // Delete department
+      const resultDelete = await knex("DEPARTMENTS")
+        .where("department_id", departmentId)
+        .del();
+      if (resultDelete) {
+        return {
+          status: true,
+          message: "Department deleted successfully",
+        };
+      } else {
+        return {
+          status: false,
+          message: "Failed to delete department",
+        };
+      }
+    } catch (error) {
+      console.error("Error occured delete department:", error);
+      throw error;
+    }
+  },
+
+  //-------------------------------- MODIFY INFORMATION DEPARTMENT---------------------------------------
+  async modifyDepartment(departmentId, departmentData) {
+    try {
+      // Check if department exists
+      const existingDepartment = await knex("DEPARTMENTS")
+        .where("department_id", departmentId)
+        .first();
+      if (!existingDepartment) {
+        return {
+          status: false,
+          message: "Department not found",
+        };
+      }
+      // Update department
+      const resultUpdate = await knex("DEPARTMENTS")
+        .where("department_id", departmentId)
+        .update(departmentData);
+      if (resultUpdate) {
+        return {
+          status: true,
+          message: "Department updated successfully",
+        };
+      } else {
+        return {
+          status: false,
+          message: "Failed to update department",
+        };
+      }
+    } catch (error) {
+      console.error("Error occured modify department:", error);
+      throw error;
+    }
+  },
 };
 
 module.exports = handleDepartment;
