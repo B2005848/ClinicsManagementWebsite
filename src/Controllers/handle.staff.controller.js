@@ -80,6 +80,23 @@ const handleStaffController = {
       next(new ApiError(400, "Failed to get account staff list!"));
     }
   },
+  //------------------------------GET INFORMATION DETAILS STAFF BY STAFF_ID------------------------------
+  async getStaffInfoById(req, res, next) {
+    try {
+      const staff_id = req.params.id;
+      const result = await handleStaffService.getStaffInfoById(staff_id);
+      if (result.status === true) {
+        return res
+          .status(200)
+          .json({ message: result.message, data: result.data });
+      } else {
+        return next(new ApiError(404, "Staff not found"));
+      }
+    } catch (error) {
+      console.log(error);
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
 };
 
 module.exports = handleStaffController;

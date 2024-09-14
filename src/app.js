@@ -2,10 +2,14 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const emailRoutes = require("./Routers/email.router");
+
 const routerAccount = require("./Routers/account.patients.route");
+
 const routerPatient = require("./Routers/handle.patient.router");
 
 const routerStaff = require("./Routers/handle.staff.route");
+
+const routerBooking = require("./Routers/handle.appointment.route");
 const {
   resourceNotFound,
   methodNotAllowed,
@@ -37,6 +41,9 @@ app.use("/api/patient/email", emailRoutes);
 
 // --------------------API FOR STAFFS---------------------
 app.use("/api/staff", routerStaff);
+
+//---------------------API FOR APPOINTMENT----------------
+app.use("/api/appointment", routerBooking);
 
 app.use(resourceNotFound);
 app.use(methodNotAllowed);

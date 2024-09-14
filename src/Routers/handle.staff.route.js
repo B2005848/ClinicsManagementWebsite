@@ -3,5 +3,5 @@ const router = express.Router();
 const handleStaffController = require("../Controllers/handle.staff.controller");
 router.post("/createAccount", handleStaffController.createAccount);
 router.get("/getListAccount", handleStaffController.getStaffList);
-
+router.get("/getInformationDetail/:id", handleStaffController.getStaffInfoById);
 module.exports = router;

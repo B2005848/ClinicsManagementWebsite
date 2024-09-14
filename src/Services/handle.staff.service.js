@@ -110,6 +110,35 @@ const handleStaffService = {
       throw error;
     }
   },
+
+  //------------------------------GET INFORMATION DETAILS STAFF BY STAFF_ID------------------------------
+  async getStaffInfoById(staffId) {
+    try {
+      // Get staff info by staff id
+      const staffInfo = await knex("STAFF_ACCOUNTS as sa")
+        .select("sd.*", "sa.role_id as role", "sa.status as statusAccount")
+        .join("STAFF_DETAILS as sd", "sd.staff_id", "sa.staff_id")
+        .where("sa.staff_id", staffId)
+        .first();
+      if (!staffInfo) {
+        console.log("Staff not found");
+        return {
+          status: false,
+          message: "Staff not found",
+        };
+      } else {
+        console.log("Get staff info by staff id success");
+        return {
+          status: true,
+          message: "Staff info",
+          data: [staffInfo],
+        };
+      }
+    } catch (error) {
+      console.error("Error during get account list staff account :", error);
+      throw error;
+    }
+  },
 };
 
 module.exports = handleStaffService;
