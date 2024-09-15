@@ -59,6 +59,35 @@ const accountStaffController = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  // ----------------------------------LOGIN ADMIN SERVICE----------------------------------------------------------
+  async checkAdminLogin(req, res, next) {
+    try {
+      const username = req.body?.username;
+      const password = req.body?.password;
+
+      if (!username) {
+        return next(new ApiError(400, "Username is required"));
+      }
+      if (!password) {
+        return next(new ApiError(400, "Password is required"));
+      }
+      const resultCheckLogin = await accountStaffService.checkAdminLogin(
+        username,
+        password
+      );
+      if (resultCheckLogin) {
+        return res.status(200).json({
+          message: "Login successful",
+          token: resultCheckLogin.token,
+        });
+      } else {
+        return next(new ApiError(400, "Invalid username or password"));
+      }
+    } catch (error) {
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
 };
 
 module.exports = accountStaffController;

@@ -1,5 +1,4 @@
 const bcrypt = require("bcryptjs");
-
 const { knex } = require("../../db.config");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
