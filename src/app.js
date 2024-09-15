@@ -2,14 +2,20 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 
+// =============ROUTER FOR PATIENTS==============>
 const emailPatientRoutes = require("./Routers/email.router");
 const routerAccountPatient = require("./Routers/account.patients.route");
 const routerPatient = require("./Routers/handle.patient.router");
 
+// ============ROUTER FOR STAFFS=================>
 const routerAccountStaff = require("./Routers/account.staff.route");
 const routerStaff = require("./Routers/handle.staff.route");
 
+//============ROUTER FOR SERVICE BOOKING=========>
 const routerBooking = require("./Routers/handle.appointment.route");
+
+//===========ROUTER FOR API DEPARTMENTS========>
+const routerDepartments = require("./Routers/handle.department.route");
 const {
   resourceNotFound,
   methodNotAllowed,
@@ -47,7 +53,7 @@ app.use("/api/handle/staff", routerStaff);
 app.use("/api/appointment", routerBooking);
 
 //----------------------API FOR DEPARTMENTS--------------
-app.use("/api/departments", require("./Routers/handle.department.route"));
+app.use("/api/departments", routerDepartments);
 
 app.use(resourceNotFound);
 app.use(methodNotAllowed);
