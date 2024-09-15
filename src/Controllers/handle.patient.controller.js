@@ -90,7 +90,7 @@ const handlePatientController = {
   // --------------------- SEARCH PATIENTS-------------------
   async searchPatients(req, res, next) {
     try {
-      const query = req.query.q;
+      const query = req.query.search;
       const resultSearch = await handlePatientService.searchPatients(query);
       if (resultSearch.success === true) {
         return res.status(200).json({

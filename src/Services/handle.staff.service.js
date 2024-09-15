@@ -149,7 +149,48 @@ const handleStaffService = {
     }
   },
 
-  //------------------- SEARCH STAFF BY NAME, EMAIL, STAFF_ID--------------------
+  //------------------- SEARCH STAFF --------------------
+  async searchStaffs(query) {
+    try {
+      // Search staff by name, email, staff id
+      const staffList = await knex("STAFF_ACCOUNTS as sa")
+        .select(
+          "sa.*",
+          "sd.first_name as first_name",
+          "sd.last_name as last_name",
+          "sd.citizen_id",
+          "sd.email as email"
+        )
+        .join("STAFF_DETAILS as sd", "sd.staff_id", "sa.staff_id")
+        .where("sa.staff_id", "like", `%${query}%`)
+        .orWhere("sd.first_name", "like", `%${query}%`)
+        .orWhere("sd.last_name", "like", `%${query}%`)
+        .orWhere("sd.citizen_id", "like", `%${query}%`)
+        .orWhere("sd.email", "like", `%${query}%`)
+        .orderBy("sd.staff_id", "asc");
+      if (staffList.length > 0) {
+        console.log("Search staff success");
+        return {
+          success: true,
+          message: "Staff list",
+          data: staffList,
+        };
+      } else {
+        console.log("Search staff not found");
+        return {
+          success: false,
+          message: "Staff not found",
+        };
+      }
+    } catch (error) {
+      console.error("Error during search staffs :", error);
+      return {
+        status: false,
+        message: "Error during search staffs",
+        error: error.message,
+      };
+    }
+  },
 };
 
 module.exports = handleStaffService;

@@ -97,6 +97,24 @@ const handleStaffController = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  //------------------- SEARCH STAFF --------------------
+  async searchStaffs(req, res, next) {
+    try {
+      const query = req.query.search;
+      const result = await handleStaffService.searchStaffs(query);
+      if (result.success === true) {
+        return res
+          .status(200)
+          .json({ message: result.message, data: result.data });
+      } else {
+        return next(new ApiError(404, "Staff not found"));
+      }
+    } catch (error) {
+      console.log(error);
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
 };
 
 module.exports = handleStaffController;
