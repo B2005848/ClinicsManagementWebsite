@@ -72,7 +72,7 @@ const accountPatientServices = {
           const token = jwt.sign(
             {
               patient_id: usernameExisting.patient_id,
-              username: usernameExisting.status,
+              username: usernameExisting.first_name,
             },
             process.env.JWT_SECRET,
             {

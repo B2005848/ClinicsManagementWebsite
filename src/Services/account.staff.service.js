@@ -54,6 +54,44 @@ const accountStaffService = {
       };
     }
   },
+
+  // ----------------------------------LOGIN ADMIN SERVICE----------------------------------------------------------
+  async checkAdminLogin(username, password) {
+    try {
+      const usernameExisting = await knex("STAFF_ACCOUNTS")
+        .where("staff_id", username)
+        .andWhere("role_id", "AD")
+        .first();
+      if (usernameExisting) {
+        const salt = usernameExisting.salt;
+        const passwd_hash = await bcrypt.hash(password, salt);
+        if (passwd_hash === usernameExisting.password) {
+          console.log(`Login success with username: ${username}`);
+          const token = jwt.sign(
+            {
+              staff_id: usernameExisting.staff_id,
+              username: usernameExisting.first_name,
+            },
+            process.env.JWT_SECRET,
+            {
+              // expiresIn 3 day
+              expiresIn: "72h",
+            }
+          );
+          return { success: true, token: token };
+        } else {
+          console.log(`Incorrect password for username: ${username}`);
+          return { success: false, message: "Incorrect password" };
+        }
+      } else {
+        console.log(`Username not found: ${username}`);
+        return { success: false, message: "Username not found" };
+      }
+    } catch (error) {
+      console.error("Error during login check:", error);
+      throw error;
+    }
+  },
 };
 
 module.exports = accountStaffService;
