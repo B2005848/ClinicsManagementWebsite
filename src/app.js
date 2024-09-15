@@ -1,12 +1,12 @@
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
-const emailRoutes = require("./Routers/email.router");
 
-const routerAccount = require("./Routers/account.patients.route");
-
+const emailPatientRoutes = require("./Routers/email.router");
+const routerAccountPatient = require("./Routers/account.patients.route");
 const routerPatient = require("./Routers/handle.patient.router");
 
+const routerAccountStaff = require("./Routers/account.staff.route");
 const routerStaff = require("./Routers/handle.staff.route");
 
 const routerBooking = require("./Routers/handle.appointment.route");
@@ -35,12 +35,13 @@ app.get("/", (req, res) => {
   });
 });
 // ----------------------------API FOR PATIENTS----------------
-app.use("/api/patient/account", routerAccount);
+app.use("/api/patient/account", routerAccountPatient);
 app.use("/api/handle/patient", routerPatient);
-app.use("/api/patient/email", emailRoutes);
+app.use("/api/patient/email", emailPatientRoutes);
 
 // --------------------API FOR STAFFS---------------------
-app.use("/api/staff", routerStaff);
+app.use("/api/staff/account", routerAccountStaff);
+app.use("/api/handle/staff", routerStaff);
 
 //---------------------API FOR APPOINTMENTS----------------
 app.use("/api/appointment", routerBooking);
