@@ -76,10 +76,11 @@ const accountStaffController = {
         username,
         password
       );
-      if (resultCheckLogin) {
+      if (resultCheckLogin.success === true) {
         return res.status(200).json({
-          message: "Login successful",
-          token: resultCheckLogin.token,
+          message: "Admin login successful",
+          accessToken: resultCheckLogin.accessToken,
+          refreshToken: resultCheckLogin.refreshToken,
         });
       } else {
         return next(new ApiError(400, "Invalid username or password"));
