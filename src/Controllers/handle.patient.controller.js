@@ -37,40 +37,26 @@ const handlePatientController = {
   async updateInformation(req, res, next) {
     try {
       const patient_id = req.params.id;
-      const {
-        first_name,
-        last_name,
-        birthday,
-        citizen_id,
-        gender,
-        phone_number,
-        major,
-        email,
-        address_contact,
-        health_insurance_id,
-      } = req.body;
+      let data = { ...req.body };
 
-      // format birthday
-      const formattedBirthday = moment(birthday, "DD/MM/YYYY").format(
-        "YYYY-MM-DD"
-      );
+      //check birthday and format
+      if (data.birthday) {
+        if (!moment(data.birthday, "DD/MM/YYYY", true).isValid()) {
+          return next(new ApiError(400, "Invalid birthday format"));
+        }
+        data.birthday = moment(data.birthday, "DD/MM/YYYY").format(
+          "YYYY-MM-DD"
+        );
+      }
 
-      const data = {
-        first_name,
-        last_name,
-        birthday: formattedBirthday,
-        citizen_id,
-        gender,
-        phone_number,
-        major,
-        email,
-        address_contact,
-        health_insurance_id,
-      };
+      if (Object.keys(data).length === 0) {
+        return next(new ApiError(400, "No information to update"));
+      }
+
       const resultUpdateInformation =
         await handlePatientService.updateInformation(patient_id, data);
+
       if (resultUpdateInformation) {
-        console.log(`update information patient id: ${patient_id} success`);
         return res.status(200).json({
           message: "Update information successful",
           data: data,
@@ -82,11 +68,12 @@ const handlePatientController = {
       return next(
         new ApiError(
           500,
-          `An error occurred while update information with patient_id: ${patient_id}`
+          `An error occurred while updating information for patient_id: ${req.params.id}`
         )
       );
     }
   },
+
   // --------------------- SEARCH PATIENTS-------------------
   async searchPatients(req, res, next) {
     try {

@@ -12,7 +12,7 @@ router.get(
 );
 
 //============= EDIT INFORMATION DETAIL OF PATIENT BY PATIENT_ID
-router.put(
+router.patch(
   "/information/update/:id",
   handlePatientController.updateInformation
 );

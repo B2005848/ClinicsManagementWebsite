@@ -61,11 +61,12 @@ const handleDepartmentController = {
   async modifyDepartment(req, res, next) {
     try {
       const department_id = req.params.id;
-      const { department_name, description } = req.body;
-      const deparmentData = {
-        department_name: department_name,
-        description: description,
-      };
+      const deparmentData = { ...req.body };
+
+      if (Object.keys(deparmentData).length === 0) {
+        return next(new ApiError(400, "No information to update"));
+      }
+
       const resultModify = await handleDepartmentService.modifyDepartment(
         department_id,
         deparmentData

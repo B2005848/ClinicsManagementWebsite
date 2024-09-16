@@ -12,5 +12,5 @@ router.post("/create", handleDepartmentController.createDepartment);
 router.delete("/delete/:id", handleDepartmentController.deleteDepartment);
 
 //============ MODIFY INFORMATION A DEPARTMENT-
-router.put("/modify/:id", handleDepartmentController.modifyDepartment);
+router.patch("/modify/:id", handleDepartmentController.modifyDepartment);
 module.exports = router;
