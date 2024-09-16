@@ -69,18 +69,37 @@ const accountPatientServices = {
         const passwd_hash = await bcrypt.hash(password, salt);
         if (passwd_hash === usernameExisting.password) {
           console.log(`Login success with username: ${username}`);
-          const token = jwt.sign(
+
+          // Create access Token
+          const accessToken = jwt.sign(
             {
               patient_id: usernameExisting.patient_id,
               username: usernameExisting.first_name,
             },
             process.env.JWT_SECRET,
             {
-              // expiresIn 3 day
-              expiresIn: "72h",
+              // expiresIn 120 minute
+              expiresIn: "120m",
             }
           );
-          return { success: true, token: token };
+
+          // Create refresh Token
+          const refreshToken = jwt.sign(
+            {
+              patient_id: usernameExisting.patient_id,
+            },
+            process.env.JWT_SECRET,
+            // expiresIn 7 day
+            {
+              expiresIn: "7d",
+            }
+          );
+
+          return {
+            success: true,
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+          };
         } else {
           console.log(`Incorrect password for username: ${username}`);
           return { success: false, message: "Incorrect password" };

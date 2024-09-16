@@ -73,7 +73,8 @@ const accountPatientControllers = {
       if (resultCheckLogin) {
         return res.status(200).json({
           message: "Login successful",
-          token: resultCheckLogin.token,
+          accessToken: resultCheckLogin.accessToken,
+          refreshToken: resultCheckLogin.refreshToken,
         });
       } else {
         return next(new ApiError(400, "Invalid username or password"));
