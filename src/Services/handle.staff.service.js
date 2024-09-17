@@ -27,11 +27,15 @@ const handleStaffService = {
       // Get staff list by position page
       const staffList = await knex("STAFF_ACCOUNTS as sa")
         .select(
-          "sa.*",
+          "sa.staff_id",
+          "sa.status",
+          "sa.role_id",
           "sd.first_name",
           "sd.last_name",
           "sd.email",
-          "sd.citizen_id"
+          "sd.citizen_id",
+          "sa.created_at",
+          "sa.updated_at"
         )
         .join("STAFF_DETAILS as sd", "sd.staff_id", "sa.staff_id")
         .orderBy("sa.staff_id", "asc")

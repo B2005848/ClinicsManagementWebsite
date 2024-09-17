@@ -9,6 +9,9 @@ const accountStaffService = {
     let transaction;
     try {
       transaction = await knex.transaction();
+      if (!accountData.password) {
+        throw new Error("Password is required");
+      }
       // status = 1: account active, 2: temporarily locked, 3: Stop working
       accountData.status = "1";
       const saltRounds = 10;
