@@ -1,7 +1,8 @@
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
-
+// =============ROUTER FOR UPLOAD FILE==========>
+const upLoadFileRoutes = require("./Routers/upload.route");
 // =============ROUTER FOR PATIENTS==============>
 const emailPatientRoutes = require("./Routers/email.router");
 const routerAccountPatient = require("./Routers/account.patients.route");
@@ -54,6 +55,9 @@ app.use("/api/appointment", routerBooking);
 
 //----------------------API FOR DEPARTMENTS--------------
 app.use("/api/departments", routerDepartments);
+
+//-----------------------API FOR UPLOAD FILE----------
+app.use("/api/file", upLoadFileRoutes);
 
 app.use(resourceNotFound);
 app.use(methodNotAllowed);
