@@ -21,6 +21,8 @@ const uploadService = {
   async uploadAvtStaffService(req, res) {
     return new Promise((resolve, reject) => {
       // Sử dụng multer để upload file
+      /* Khi có yêu cầu thì multer sẽ tìm key có tên là avatar 
+      và lấy giá trị đó để thực hiện upload file theo định nghĩa ở phần diskStorage*/
       upload.single("avatar")(req, res, async (err) => {
         if (err) {
           console.log("Multer error:", err);
