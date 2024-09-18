@@ -53,16 +53,23 @@ const handleStaffService = {
           message: "Staff list is empty",
           totalPages,
           staffList,
+          itemsPerPage,
         };
       } else {
         console.log(
           `Get staff list success . Total staffs: ${totalStaffsCount}`
         );
+        console.log("Response from getStaffAccountList:", {
+          staffList,
+          totalPages,
+          itemsPerPage,
+        });
         return {
           status: true,
           message: "Account staff list",
           totalPages,
           staffList,
+          itemsPerPage,
         };
       }
     } catch (error) {

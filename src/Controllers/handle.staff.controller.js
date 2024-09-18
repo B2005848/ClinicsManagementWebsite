@@ -7,7 +7,7 @@ const handleStaffController = {
   async getStaffList(req, res, next) {
     try {
       const page = parseInt(req.query.page) || 1;
-      const { message, staffList, totalPages } =
+      const { message, staffList, totalPages, itemsPerPage } =
         await handleStaffService.getStaffAccountList(page);
 
       if (staffList === 0) {
@@ -18,7 +18,7 @@ const handleStaffController = {
         });
       }
 
-      res.status(200).json({ message, staffList, totalPages });
+      res.status(200).json({ message, staffList, totalPages, itemsPerPage });
     } catch (error) {
       next(new ApiError(400, "Failed to get account staff list!"));
     }
