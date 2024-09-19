@@ -5,9 +5,9 @@ const handleDepartmentController = {
   async getDepartments(req, res, next) {
     try {
       const page = parseInt(req.query.page) || 1;
-      const { message, totalPages, listDepartments } =
+      const { message, totalPages, itemsPerPage, listDepartments } =
         await handleDepartmentService.getDepartments(page);
-      res.json({ page, message, totalPages, listDepartments });
+      res.json({ page, message, totalPages, itemsPerPage, listDepartments });
       console.log({ message, totalPages, listDepartments });
     } catch (error) {
       next(new ApiError(400, "get all patient fail!"));

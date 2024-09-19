@@ -33,6 +33,7 @@ const handleDepartment = {
           status: true,
           message: "Departments retrieved successfully",
           totalPages,
+          itemsPerPage,
           listDepartments: departments,
         };
       }
