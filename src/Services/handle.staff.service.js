@@ -88,6 +88,12 @@ const handleStaffService = {
         .join("STAFF_DETAILS as sd", "sd.staff_id", "sa.staff_id")
         .where("sa.staff_id", staffId)
         .first();
+
+      const staff_specialty = await knex("STAFF_SPECIALTY as sp")
+        .select("sp.staff_specialty_id", "spe.specialty_name")
+        .join("SPECIALTIES as spe", "spe.specialty_id", "sp.specialty_id")
+        .where("sp.staff_id", staffId);
+
       if (!staffInfo) {
         console.log("Staff not found");
         return {
@@ -100,6 +106,7 @@ const handleStaffService = {
           status: true,
           message: "Staff info",
           data: [staffInfo],
+          specialty: [staff_specialty],
         };
       }
     } catch (error) {
