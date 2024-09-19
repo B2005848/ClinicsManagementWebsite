@@ -1,4 +1,5 @@
 const { knex } = require("../../db.config");
+const handleDepartmentController = require("../Controllers/handle.department.controller");
 
 const handleDepartment = {
   //----------------------------------------------GET LIST DEPARTMENTS--------------------------------
@@ -144,6 +145,40 @@ const handleDepartment = {
     } catch (error) {
       console.error("Error occured modify department:", error);
       throw error;
+    }
+  },
+
+  //------------------- SEARCH DEPARTMENTS --------------------
+  async searchDepartments(query) {
+    try {
+      // Search departments by id, description, name
+      const deparmentList = await knex("DEPARTMENTS as dep")
+        .select("dep.*")
+        .where("dep.department_id", "like", `%${query}%`)
+        .orWhere("dep.department_name", "like", `%${query}%`)
+        .orWhere("dep.description", "like", `%${query}%`)
+        .orderBy("dep.department_id", "asc");
+      if (deparmentList.length > 0) {
+        console.log("Search department success");
+        return {
+          success: true,
+          message: "Department list",
+          data: deparmentList,
+        };
+      } else {
+        console.log("Search departments not found");
+        return {
+          success: false,
+          message: "department not found",
+        };
+      }
+    } catch (error) {
+      console.error("Error during search departments :", error);
+      return {
+        status: false,
+        message: "Error during search deparments",
+        error: error.message,
+      };
     }
   },
 };

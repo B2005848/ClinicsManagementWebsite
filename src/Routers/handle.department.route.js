@@ -13,4 +13,7 @@ router.delete("/delete/:id", handleDepartmentController.deleteDepartment);
 
 //============ MODIFY INFORMATION A DEPARTMENT-
 router.patch("/modify/:id", handleDepartmentController.modifyDepartment);
+
+// ========SEARCH DEPARTMENTS=========================
+router.get("/search", handleDepartmentController.searchDepartments);
 module.exports = router;
