@@ -66,7 +66,7 @@ const accountStaffController = {
       }
 
       return res.status(200).json({
-        message: "Batch create accounts",
+        message: "create accounts success",
         data: results,
       });
     } catch (error) {
