@@ -27,8 +27,10 @@ const handlePatientService = {
       const patients = await knex("PATIENT_ACCOUNTS as pa")
         .select(
           "pa.*",
-          "pd.first_name as firstname",
+          "pd.first_name",
           "pd.last_name",
+          "pd.birthday",
+          "pd.email",
           "pd.citizen_id"
         )
         .join("PATIENT_DETAILS as pd", "pd.patient_id", "pa.patient_id")
