@@ -29,7 +29,7 @@ const handleStaffService = {
         .select(
           "sa.staff_id",
           "sa.status",
-          "sa.role_id",
+          "r.role_name",
           "sd.first_name",
           "sd.last_name",
           "sd.email",
@@ -38,6 +38,7 @@ const handleStaffService = {
           "sa.updated_at"
         )
         .join("STAFF_DETAILS as sd", "sd.staff_id", "sa.staff_id")
+        .join("ROLES as r", "sa.role_id", "r.role_id")
         .orderBy("sa.staff_id", "asc")
         .limit(itemsPerPage)
         .offset(offset);
