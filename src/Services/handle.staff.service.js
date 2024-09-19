@@ -84,8 +84,13 @@ const handleStaffService = {
     try {
       // Get staff info by staff id
       const staffInfo = await knex("STAFF_ACCOUNTS as sa")
-        .select("sd.*", "sa.role_id as role", "sa.status as statusAccount")
+        .select(
+          "sd.*",
+          "r.role_name as role_name",
+          "sa.status as statusAccount"
+        )
         .join("STAFF_DETAILS as sd", "sd.staff_id", "sa.staff_id")
+        .join("ROLES as r", "r.role_id", "sa.role_id")
         .where("sa.staff_id", staffId)
         .first();
 
@@ -105,8 +110,8 @@ const handleStaffService = {
         return {
           status: true,
           message: "Staff info",
-          data: [staffInfo],
-          specialty: [staff_specialty],
+          data: staffInfo,
+          specialty: staff_specialty,
         };
       }
     } catch (error) {
