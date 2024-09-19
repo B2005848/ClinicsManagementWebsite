@@ -41,6 +41,7 @@ const handlePatientService = {
           message: "Get list patient successfully",
           patients,
           totalPages,
+          itemsPerPage,
         };
       }
     } catch (error) {

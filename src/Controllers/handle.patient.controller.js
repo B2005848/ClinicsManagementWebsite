@@ -8,9 +8,9 @@ const handlePatientController = {
   async getListAccountPatients(req, res, next) {
     try {
       const page = parseInt(req.query.page) || 1;
-      const { message, patients, totalPages } =
+      const { message, patients, totalPages, itemsPerPage } =
         await handlePatientService.getListAccountPatients(page);
-      res.status(200).json({ message, totalPages, patients });
+      res.status(200).json({ message, totalPages, itemsPerPage, patients });
     } catch (error) {
       next(new ApiError(400, "get all patient fail!"));
     }
