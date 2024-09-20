@@ -64,6 +64,74 @@ const handleShiftService = {
       throw error;
     }
   },
+
+  //----------------------------GET LIST STAFF WORKED IN EACH SHIFTS BY SHIFT_ID-------------------------
+  async getListStaffByShiftId(shift_id, page) {
+    try {
+      const itemsPerPage = 10;
+
+      const offset = (page - 1) * itemsPerPage;
+
+      const totalShitfStaff = await knex("STAFF_SHIFTS")
+        .count("* as totalCount")
+        .first();
+
+      const totalShitfStaffCount = totalShitfStaff.totalCount;
+      const totalPages = Math.ceil(totalShitfStaffCount / itemsPerPage);
+      if (page > totalPages) {
+        return {
+          status: false,
+          message: `Page ${page} exceeds total number of pages (${totalPages}). No shifts available.`,
+          totalPages,
+          ShiftStaff: [],
+        };
+      }
+
+      // get Staff list by shift_id and page
+      const shiftStaffList = await knex("STAFF_SHIFTS as ss")
+        .select("ss.*")
+        .join("STAFF_ACCOUNTS as sd", "sd.staff_id", "ss.staff_id")
+        .join("SHIFTS as sh", "sh.shift_id", "ss.shift_id")
+        .where("ss.shift_id", shift_id)
+        .limit(itemsPerPage)
+        .offset(offset);
+
+      if (shiftStaffList.length === 0) {
+        console.log({
+          status: false,
+          message: "staff list by shift_id is empty",
+          totalPages,
+          shiftStaffList,
+          itemsPerPage,
+        });
+        return {
+          status: false,
+          message: "staff list by shift_id is empty",
+          totalPages,
+          shiftStaffList,
+          itemsPerPage,
+        };
+      } else {
+        console.log({
+          status: true,
+          message: "List staff by shift_id",
+          totalPages,
+          shiftStaffList,
+          itemsPerPage,
+        });
+        return {
+          status: true,
+          message: "List staff by shift_id",
+          totalPages,
+          shiftStaffList,
+          itemsPerPage,
+        };
+      }
+    } catch (error) {
+      console.error("Error during get list shifts :", error);
+      throw error;
+    }
+  },
 };
 
 module.exports = handleShiftService;
