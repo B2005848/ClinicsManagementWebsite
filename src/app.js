@@ -12,6 +12,9 @@ const routerPatient = require("./Routers/handle.patient.router");
 const routerAccountStaff = require("./Routers/account.staff.route");
 const routerStaff = require("./Routers/handle.staff.route");
 
+//============== ROUTER FOR SHIFT===============
+const routerShift = require("./Routers/handle.shift.route");
+
 //============ROUTER FOR SERVICE BOOKING=========>
 const routerBooking = require("./Routers/handle.appointment.route");
 
@@ -59,6 +62,9 @@ app.use("/api/patient/email", emailPatientRoutes);
 // --------------------API FOR STAFFS---------------------
 app.use("/api/staff/account", routerAccountStaff);
 app.use("/api/handle/staff", routerStaff);
+
+//---------------------API FOR SHIFTS--------------------
+app.use("/api/shifts", routerShift);
 
 //---------------------API FOR APPOINTMENTS----------------
 app.use("/api/appointment", routerBooking);

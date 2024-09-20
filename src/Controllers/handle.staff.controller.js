@@ -1,6 +1,5 @@
 const ApiError = require("../api-error");
 const handleStaffService = require("../Services/handle.staff.service");
-const moment = require("moment");
 
 const handleStaffController = {
   // ----------------------------GET ACCOUNT ALL STAFF------------------------------
@@ -29,13 +28,11 @@ const handleStaffController = {
       const staff_id = req.params.id;
       const result = await handleStaffService.getStaffInfoById(staff_id);
       if (result.status === true) {
-        return res
-          .status(200)
-          .json({
-            message: result.message,
-            data: result.data,
-            specialty: result.specialty,
-          });
+        return res.status(200).json({
+          message: result.message,
+          data: result.data,
+          specialty: result.specialty,
+        });
       } else {
         return next(new ApiError(404, "Staff not found"));
       }
