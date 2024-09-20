@@ -81,6 +81,7 @@ const handleShiftService = {
 
       const totalShitfStaff = await knex("STAFF_SHIFTS")
         .count("* as totalCount")
+        .where("STAFF_SHIFTS.shift_id", shift_id)
         .first();
 
       const totalShitfStaffCount = totalShitfStaff.totalCount;
@@ -118,6 +119,7 @@ const handleShiftService = {
         .join("DEPARTMENTS as dep", "dep.department_id", "ss.department_id")
         .join("SPECIALTIES as spe", "spe.specialty_id", "ss.specialty_id")
         .where("ss.shift_id", shift_id)
+        .orderBy("ss.shift_date", "asc")
         .limit(itemsPerPage)
         .offset(offset);
 
@@ -153,7 +155,12 @@ const handleShiftService = {
         };
       }
     } catch (error) {
-      console.error("Error during get list shifts :", error);
+      console.error("Error during get list shifts :", error.message);
+      console.log("Shift ID:", shift_id);
+      console.log("Offset:", offset);
+      console.log("Items per Page:", itemsPerPage);
+      console.log("Shift Staff List Query:", shiftStaffList.toSQL().toNative());
+
       throw error;
     }
   },
