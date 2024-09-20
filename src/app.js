@@ -41,8 +41,10 @@ app.get("/", (req, res) => {
     message: "Server CTU final project",
   });
 });
+
+// ----------------------- API GET FILE AVATAR STAFF----------
 app.use(
-  "/get/avtStaffs",
+  "/uploads/avtStaffs",
   (req, res, next) => {
     console.log(`Request for: ${req.url}`);
     next();
