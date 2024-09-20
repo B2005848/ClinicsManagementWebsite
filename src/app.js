@@ -41,6 +41,14 @@ app.get("/", (req, res) => {
     message: "Server CTU final project",
   });
 });
+app.use(
+  "/uploads/avtStaffs",
+  (req, res, next) => {
+    console.log(`Request for: ${req.url}`);
+    next();
+  },
+  express.static(path.join(__dirname, "uploads/avtStaffs"))
+);
 // ----------------------------API FOR PATIENTS----------------
 app.use("/api/patient/account", routerAccountPatient);
 app.use("/api/handle/patient", routerPatient);
