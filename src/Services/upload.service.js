@@ -19,7 +19,7 @@ const fileFilter = (req, file, cb) => {
 // Cấu hình multer để lưu ảnh vào thư mục 'Uploads' với tên gốc của file
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "Uploads/avtStaffs"); // Thư mục lưu ảnh
+    cb(null, path.join(__dirname, "..", "uploads", "avtStaffs")); // Thư mục lưu ảnh
   },
   filename: (req, file, cb) => {
     const originalName = file.originalname;
@@ -64,7 +64,7 @@ const uploadService = {
             });
           }
 
-          const filePath = `/Uploads/avtStaffs/${req.file.filename}`; // Đường dẫn lưu ảnh
+          const filePath = `/uploads/avtStaffs/${req.file.filename}`; // Đường dẫn lưu ảnh
 
           // Lưu đường dẫn ảnh vào SQL Server
           await knex("STAFF_DETAILS")

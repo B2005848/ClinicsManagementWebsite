@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
   });
 });
 app.use(
-  "/uploads/avtStaffs",
+  "/get/avtStaffs",
   (req, res, next) => {
     console.log(`Request for: ${req.url}`);
     next();
