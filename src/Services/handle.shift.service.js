@@ -24,7 +24,14 @@ const handleShiftService = {
       }
       // Get shift list by position page
       const shiftList = await knex("SHIFTS as sh")
-        .select("sh.*")
+        .select(
+          knex.raw("TRIM(sh.shift_id) as shift_id"),
+          "sh.shift_name",
+          "sh.start_time",
+          "sh.end_time",
+          "sh.created_at",
+          "sh.updated_at"
+        )
         .orderBy("sh.shift_id", "asc")
         .limit(itemsPerPage)
         .offset(offset);
