@@ -94,6 +94,7 @@ const handleShiftService = {
           "sd.first_name",
           "sd.last_name",
           "ss.shift_date as join_in",
+          // fix khoảng trắng id
           knex.raw("TRIM(ss.shift_id) as shift_id"),
           "sh.shift_name",
           "sh.start_time",
