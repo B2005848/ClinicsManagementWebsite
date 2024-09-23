@@ -101,6 +101,7 @@ const handleShiftService = {
           "ss.staff_id",
           "sd.first_name",
           "sd.last_name",
+          "rol.role_name",
           "ss.shift_date as join_in",
           // fix khoảng trắng id
           knex.raw("TRIM(ss.shift_id) as shift_id"),
@@ -109,15 +110,14 @@ const handleShiftService = {
           "sh.end_time",
           "dep.department_id",
           "dep.department_name",
-          "ss.specialty_id",
-          "spe.specialty_name",
           "ss.created_at",
           "ss.updated_at"
         )
         .join("STAFF_DETAILS as sd", "sd.staff_id", "ss.staff_id")
         .join("SHIFTS as sh", "sh.shift_id", "ss.shift_id")
         .join("DEPARTMENTS as dep", "dep.department_id", "ss.department_id")
-        .join("SPECIALTIES as spe", "spe.specialty_id", "ss.specialty_id")
+        .join("STAFF_ACCOUNTS as sc", "sc.staff_id", "ss.staff_id")
+        .join("ROLES as rol", "rol.role_id", "sc.role_id")
         .where("ss.shift_id", shift_id)
         .orderBy("ss.shift_date", "asc")
         .limit(itemsPerPage)
