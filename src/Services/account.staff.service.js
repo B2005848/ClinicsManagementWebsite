@@ -159,6 +159,45 @@ const accountStaffService = {
       };
     }
   },
+
+  // ----------------------------------CHECK ACCESS TOKEN----------------------------------------------------------
+  async checkAccessToken(accessToken) {
+    try {
+      // Kiểm tra Access Token
+      const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+      return {
+        success: true,
+        message: "Access token is valid.",
+        staff_id: decoded.staff_id,
+        username: decoded.username,
+        expiresAt: decoded.exp, // Lấy thời gian hết hạn
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: "Access token is invalid or has expired.",
+      };
+    }
+  },
+
+  // ----------------------------------CHECK REFRESH TOKEN----------------------------------------------------------
+  async checkRefreshToken(refeshToken) {
+    try {
+      // Kiểm tra Access Token
+      const decoded = jwt.verify(refeshToken, process.env.JWT_SECRET);
+      return {
+        success: true,
+        message: "Refresh token is valid.",
+        staff_id: decoded.staff_id,
+        expiresAt: decoded.exp, // Lấy thời gian hết hạn
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: "Access token is invalid or has expired.",
+      };
+    }
+  },
 };
 
 module.exports = accountStaffService;

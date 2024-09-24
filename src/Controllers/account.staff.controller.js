@@ -122,6 +122,57 @@ const accountStaffController = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  // ----------------------------------CHECK ACCESS TOKEN----------------------------------------------------------
+  async checkAccessToken(req, res, next) {
+    try {
+      const { accessToken } = req.body; // Nhận access token từ request body
+
+      if (!accessToken) {
+        return next(new ApiError(400, "Access token is required"));
+      }
+
+      const result = await accountStaffService.checkAccessToken(accessToken); // Gọi dịch vụ để kiểm tra token
+
+      if (result.success) {
+        return res.status(200).json({
+          message: "Access token is valid",
+          staff_id: result.staff_id,
+          username: result.username,
+          expiresAt: result.expiresAt,
+        });
+      } else {
+        return next(new ApiError(401, result.message)); // Trả về lỗi nếu token không hợp lệ
+      }
+    } catch (error) {
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
+
+  // ----------------------------------CHECK REFRESH TOKEN----------------------------------------------------------
+  async checkRefreshToken(req, res, next) {
+    try {
+      const { refreshToken } = req.body; // Nhận access token từ request body
+
+      if (!refreshToken) {
+        return next(new ApiError(400, "Refresh token is required"));
+      }
+
+      const result = await accountStaffService.checkRefreshToken(refreshToken); // Gọi dịch vụ để kiểm tra token
+
+      if (result.success) {
+        return res.status(200).json({
+          message: "Access token is valid",
+          staff_id: result.staff_id,
+          expiresAt: result.expiresAt,
+        });
+      } else {
+        return next(new ApiError(401, result.message)); // Trả về lỗi nếu token không hợp lệ
+      }
+    } catch (error) {
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
 };
 
 module.exports = accountStaffController;
