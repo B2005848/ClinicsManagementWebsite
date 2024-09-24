@@ -96,9 +96,27 @@ const accountStaffController = {
           message: "Admin login successful",
           accessToken: resultCheckLogin.accessToken,
           refreshToken: resultCheckLogin.refreshToken,
+          accessTokenExpiry: resultCheckLogin.accessTokenExpiry,
+          refreshTokenExpiry: resultCheckLogin.refreshTokenExpiry,
         });
       } else {
         return next(new ApiError(400, "Invalid username or password"));
+      }
+    } catch (error) {
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
+
+  // ----------------------------------REFRESH ACCESS TOKEN----------------------------------------------------------
+  async refreshAccessToken(req, res, next) {
+    try {
+      const { refreshToken } = req.body; // Nhận refresh token từ request body
+      const result = await accountStaffService.refreshAccessToken(refreshToken);
+
+      if (result.success) {
+        return res.status(200).json(result);
+      } else {
+        return next(new ApiError(403, result.message)); // Trả về lỗi nếu không thành công
       }
     } catch (error) {
       return next(new ApiError(500, "Internal Server Error"));

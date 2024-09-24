@@ -8,4 +8,7 @@ router.post("/createAccount", accountStaffController.createAccount);
 //=========CHECK ADMIN LOGIN=============
 router.post("/adminLogin", accountStaffController.checkAdminLogin);
 
+//============= REFRESH ACCESS TOKEN ==============
+router.post("/refreshAccessToken", accountStaffController.refreshAccessToken);
+
 module.exports = router;

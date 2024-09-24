@@ -94,10 +94,18 @@ const accountStaffService = {
             }
           );
 
+          const accessTokenExpiry = Math.floor(Date.now() / 1000) + 120 * 60; // 120 phút
+          const refreshTokenExpiry =
+            Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60; // 7 ngày
+          console.log(`accessTokenExpiry: ${accessTokenExpiry}`);
+          console.log(`refreshTokenExpiry: ${refreshTokenExpiry}`);
+
           return {
             success: true,
             accessToken: accessToken,
             refreshToken: refreshToken,
+            accessTokenExpiry: accessTokenExpiry,
+            refreshTokenExpiry: refreshTokenExpiry,
           };
         } else {
           console.log(`Incorrect password for username: ${username}`);
@@ -110,6 +118,45 @@ const accountStaffService = {
     } catch (error) {
       console.error("Error during login check:", error);
       throw error;
+    }
+  },
+
+  // ----------------------------------REFRESH ACCESS TOKEN----------------------------------------------------------
+  async refreshAccessToken(refreshToken) {
+    try {
+      if (!refreshToken) {
+        throw new Error("Refesh token is require");
+      }
+
+      // Verify the refesh Token
+      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+      if (!decoded) {
+        throw new Error("Invalid refresh token!");
+      }
+
+      // create new access token by refreshToken
+      const accessToken = jwt.sign(
+        {
+          staffId: decoded.staff_id,
+          username: decoded.username,
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "120m",
+        }
+      );
+
+      return {
+        success: true,
+        message: "refresh access token success!",
+        accessToken: accessToken,
+      };
+    } catch (error) {
+      console.error("Error refresh access tọken", error);
+      return {
+        success: false,
+        message: error.message,
+      };
     }
   },
 };
