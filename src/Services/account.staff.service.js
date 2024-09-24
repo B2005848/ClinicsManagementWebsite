@@ -90,7 +90,7 @@ const accountStaffService = {
             process.env.JWT_SECRET,
             // expiresIn 7 day
             {
-              expiresIn: "7d",
+              expiresIn: "7s",
             }
           );
 
@@ -145,11 +145,13 @@ const accountStaffService = {
           expiresIn: "120m",
         }
       );
+      const accessTokenExpiry = Math.floor(Date.now() / 1000) + 120 * 60; // 120 phút
 
       return {
         success: true,
         message: "refresh access token success!",
         accessToken: accessToken,
+        accessTokenExpiry: accessTokenExpiry,
       };
     } catch (error) {
       console.error("Error refresh access tọken", error);
