@@ -90,7 +90,7 @@ const accountStaffService = {
             process.env.JWT_SECRET,
             // expiresIn 7 day
             {
-              expiresIn: "7s",
+              expiresIn: "7d",
             }
           );
 
