@@ -70,7 +70,7 @@ const accountPatientControllers = {
         username,
         password
       );
-      if (resultCheckLogin) {
+      if (resultCheckLogin.success === true) {
         return res.status(200).json({
           message: "Login successful",
           accessToken: resultCheckLogin.accessToken,
