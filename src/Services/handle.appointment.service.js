@@ -54,6 +54,26 @@ const handleBookingService = {
       };
     }
   },
+
+  //Modify status appointment
+  async ModifyStatus(appointment_id, status) {
+    try {
+      const resultModify = await knex("APPOINTMENTS")
+        .where("appointment_id", appointment_id)
+        .update("status", status);
+      if (resultModify) {
+        return {
+          success: true,
+          message: "Status updated successfully",
+        };
+      } else {
+        return { success: false, message: "Failed to update status" };
+      }
+    } catch (error) {
+      console.error("Error during update status booking:", error);
+      throw error;
+    }
+  },
 };
 
 module.exports = handleBookingService;
