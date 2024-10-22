@@ -34,6 +34,26 @@ const handleAppointmentController = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  //Modify status appointment
+  async ModifyStatus(req, res, next) {
+    try {
+      const appointment_id = req.params.id;
+      const status = req.body.status;
+
+      const result = await handleAppointmentService.ModifyStatus(
+        appointment_id,
+        status
+      );
+      if (result.success === true) {
+        res.json({ message: result.message, status: result.success });
+      } else {
+        res.json({ message: result.message, status: result.success });
+      }
+    } catch (error) {
+      return next(new ApiError(500, error.message));
+    }
+  },
 };
 
 module.exports = handleAppointmentController;

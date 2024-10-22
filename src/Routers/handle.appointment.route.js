@@ -6,4 +6,7 @@ router.post(
   "/booking/:patient_id",
   handleAppointmentController.AppointmentBooking
 );
+
+router.put("/modifyStatus/:id", handleAppointmentController.ModifyStatus);
+
 module.exports = router;
