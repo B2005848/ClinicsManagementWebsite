@@ -162,6 +162,41 @@ const handleStaffService = {
       };
     }
   },
+
+  // ---------------------------SELECT DOCTOR BY SPECIALTY------------------
+
+  async selectDoctorBySpecialtyId(specialty_id) {
+    try {
+      const doctorInfo = await knex("STAFF_SPECIALTY as sp")
+        .select("sp.staff_id as doctor_id", "sd.*")
+        .join("STAFF_ACCOUNTS as sa", "sa.staff_id", "sp.staff_id")
+        .join("STAFF_DETAILS as sd", "sd.staff_id", "sp.staff_id")
+        .where("sa.role_id", "BS")
+        .andWhere("sp.specialty_id", specialty_id);
+
+      if (doctorInfo.length > 0) {
+        console.log(`Select doctor by specialty: ${specialty_id} success!`);
+        return {
+          success: true,
+          message: "List doctor",
+          data: doctorInfo,
+        };
+      } else {
+        console.log("Doctor not found!");
+        return {
+          success: false,
+          message: "Doctor not found",
+        };
+      }
+    } catch (error) {
+      console.error("Error during search doctor :", error);
+      return {
+        status: false,
+        message: "Error during search doctor",
+        error: error.message,
+      };
+    }
+  },
 };
 
 module.exports = handleStaffService;
