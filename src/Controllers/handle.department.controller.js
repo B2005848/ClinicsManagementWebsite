@@ -1,12 +1,25 @@
 const ApiError = require("../api-error");
 const handleDepartmentService = require("../Services/handle.department.service");
 const handleDepartmentController = {
-  //------------------------------------------------------GET LIST DEPARTMENTS--------------------------------
-  async getDepartments(req, res, next) {
+  //------------------------------------------------------GET LIST DEPARTMENTS FOR PATIENT--------------------------------
+  async getDepartmentsForPatient(req, res, next) {
     try {
       const page = parseInt(req.query.page) || 1;
       const { message, totalPages, itemsPerPage, listDepartments } =
-        await handleDepartmentService.getDepartments(page);
+        await handleDepartmentService.getDepartmentsForPatient(page);
+      res.json({ page, message, totalPages, itemsPerPage, listDepartments });
+      console.log({ message, totalPages, listDepartments });
+    } catch (error) {
+      next(new ApiError(400, "get all patient fail!"));
+    }
+  },
+
+  //------------------------------------------------------GET LIST DEPARTMENTS FOR ADMIN--------------------------------
+  async getDepartmentsForAdmin(req, res, next) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const { message, totalPages, itemsPerPage, listDepartments } =
+        await handleDepartmentService.getDepartmentsForAdmin(page);
       res.json({ page, message, totalPages, itemsPerPage, listDepartments });
       console.log({ message, totalPages, listDepartments });
     } catch (error) {

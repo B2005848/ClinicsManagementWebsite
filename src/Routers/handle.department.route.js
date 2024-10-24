@@ -3,7 +3,15 @@ const router = express.Router();
 const handleDepartmentController = require("../Controllers/handle.department.controller");
 
 //====== GET LIST DEPARTMENT
-router.get("/getList", handleDepartmentController.getDepartments);
+router.get(
+  "/getListForPatient",
+  handleDepartmentController.getDepartmentsForPatient
+);
+
+router.get(
+  "/getListForAdmin",
+  handleDepartmentController.getDepartmentsForAdmin
+);
 
 //========== CREATE A NEW DEPARTMENT
 router.post("/create", handleDepartmentController.createDepartment);

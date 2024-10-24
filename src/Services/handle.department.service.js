@@ -2,8 +2,8 @@ const { knex } = require("../../db.config");
 const handleDepartmentController = require("../Controllers/handle.department.controller");
 
 const handleDepartment = {
-  //----------------------------------------------GET LIST DEPARTMENTS--------------------------------
-  async getDepartments(page) {
+  //----------------------------------------------GET LIST DEPARTMENTS FOR ADMIN--------------------------------
+  async getDepartmentsForAdmin(page) {
     try {
       const itemsPerPage = 10;
       const offset = (page - 1) * itemsPerPage;
@@ -26,6 +26,49 @@ const handleDepartment = {
       // Get departments
       const departments = await knex("DEPARTMENTS")
         .orderBy("department_id", "asc")
+        .limit(itemsPerPage)
+        .offset(offset);
+
+      if (departments) {
+        return {
+          status: true,
+          message: "Departments retrieved successfully",
+          totalPages,
+          itemsPerPage,
+          listDepartments: departments,
+        };
+      }
+    } catch (error) {
+      console.error("Error occured get departments:", error);
+      throw error;
+    }
+  },
+  //----------------------------------------------GET LIST DEPARTMENTS FOR PATIENTS--------------------------------
+  async getDepartmentsForPatient(page) {
+    try {
+      const itemsPerPage = 10;
+      const offset = (page - 1) * itemsPerPage;
+
+      // Get totals quantity departments
+      const totalDepartments = await knex("DEPARTMENTS")
+        .count("* as totalCount")
+        .whereNot("department_id", "CASH")
+        .first();
+      const totalItems = totalDepartments.totalCount;
+      // Calculate quantity page
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+      if (page > totalPages) {
+        return {
+          status: false,
+          message: `Page ${page} exceeds total number of pages (${totalPages}). No deparment available.`,
+          totalPages,
+          listDepartments: [],
+        };
+      }
+      // Get departments
+      const departments = await knex("DEPARTMENTS")
+        .orderBy("department_id", "asc")
+        .whereNot("department_id", "CASH")
         .limit(itemsPerPage)
         .offset(offset);
 
