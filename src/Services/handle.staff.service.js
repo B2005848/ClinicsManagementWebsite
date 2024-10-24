@@ -162,6 +162,59 @@ const handleStaffService = {
       };
     }
   },
+
+  // ---------------------------SELECT DOCTOR BY SPECIALTY------------------
+
+  async selectDoctorBySpecialtyId(specialty_id) {
+    try {
+      const doctorInfo = await knex("STAFF_SPECIALTY as sp")
+        .select("sp.staff_id as doctor_id", "sd.first_name", "sd.last_name")
+        .join("STAFF_ACCOUNTS as sa", "sa.staff_id", "sp.staff_id")
+        .join("STAFF_DETAILS as sd", "sd.staff_id", "sp.staff_id")
+        .where("sa.role_id", "BS")
+        .andWhere("sp.specialty_id", specialty_id);
+
+      if (doctorInfo.length > 0) {
+        // Lặp qua từng bác sĩ để lấy thông tin ca làm việc
+        for (const doctor of doctorInfo) {
+          const shifts = await knex("STAFF_SHIFTS as ss")
+            .select("s.shift_name")
+            .join("SHIFTS as s", "s.shift_id", "ss.shift_id")
+            .where("ss.staff_id", doctor.doctor_id);
+
+          const specialty = await knex("STAFF_SPECIALTY as ss")
+            .select("s.specialty_name")
+            .join("SPECIALTIES as s", "s.specialty_id", "ss.specialty_id")
+            .where("ss.staff_id", doctor.doctor_id);
+          // Đính kèm danh sách ca làm việc vào đối tượng bác sĩ
+          doctor.shifts = shifts.map((shift) => shift.shift_name);
+          doctor.specialty = specialty.map(
+            (specialty) => specialty.specialty_name
+          );
+        }
+
+        console.log(`Select doctor by specialty: ${specialty_id} success!`);
+        return {
+          success: true,
+          message: "List of doctors with shifts",
+          data: doctorInfo,
+        };
+      } else {
+        console.log("Doctor not found!");
+        return {
+          success: false,
+          message: "Doctor not found",
+        };
+      }
+    } catch (error) {
+      console.error("Error during search doctor :", error);
+      return {
+        status: false,
+        message: "Error during search doctor",
+        error: error.message,
+      };
+    }
+  },
 };
 
 module.exports = handleStaffService;

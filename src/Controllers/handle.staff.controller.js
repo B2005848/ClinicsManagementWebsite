@@ -59,6 +59,27 @@ const handleStaffController = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  // ---------------------------SELECT DOCTOR BY SPECIALTY---------------
+  async selectDoctorBySpecialtyId(req, res, next) {
+    try {
+      const specialty_id = req.params.id;
+      const result = await handleStaffService.selectDoctorBySpecialtyId(
+        specialty_id
+      );
+      if (result.success === true) {
+        return res.status(200).json({
+          message: result.message,
+          data: result.data,
+        });
+      } else {
+        return next(new ApiError(404, "Doctor not found"));
+      }
+    } catch (error) {
+      console.log(error);
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
 };
 
 module.exports = handleStaffController;
