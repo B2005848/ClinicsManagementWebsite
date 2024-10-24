@@ -20,6 +20,9 @@ const routerBooking = require("./Routers/handle.appointment.route");
 
 //===========ROUTER FOR API DEPARTMENTS========>
 const routerDepartments = require("./Routers/handle.department.route");
+
+//==========ROUTER FOR API SERVICE MANAGEMENTS======>
+const routerServices = require("./Routers/handle.service.router");
 const {
   resourceNotFound,
   methodNotAllowed,
@@ -71,6 +74,9 @@ app.use("/api/appointment", routerBooking);
 
 //----------------------API FOR DEPARTMENTS--------------
 app.use("/api/departments", routerDepartments);
+
+//----------------------API FOR SERVICES--------------
+app.use("/api/services", routerServices);
 
 //-----------------------API FOR UPLOAD FILE----------
 app.use("/api/file", upLoadFileRoutes);
