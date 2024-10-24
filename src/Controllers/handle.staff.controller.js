@@ -70,7 +70,7 @@ const handleStaffController = {
       if (result.success === true) {
         return res.status(200).json({
           message: result.message,
-          data: result.data,
+          dataInfo: result.data,
         });
       } else {
         return next(new ApiError(404, "Doctor not found"));
