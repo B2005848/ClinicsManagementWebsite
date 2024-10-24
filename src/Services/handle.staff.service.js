@@ -164,11 +164,11 @@ const handleStaffService = {
   },
 
   // ---------------------------SELECT DOCTOR BY SPECIALTY------------------
-
   async selectDoctorBySpecialtyId(specialty_id) {
     try {
       const doctorInfo = await knex("STAFF_SPECIALTY as sp")
         .select("sp.staff_id as doctor_id", "sd.first_name", "sd.last_name")
+        .select("sp.staff_id as doctor_id", "sd.*")
         .join("STAFF_ACCOUNTS as sa", "sa.staff_id", "sp.staff_id")
         .join("STAFF_DETAILS as sd", "sd.staff_id", "sp.staff_id")
         .where("sa.role_id", "BS")
@@ -196,7 +196,7 @@ const handleStaffService = {
         console.log(`Select doctor by specialty: ${specialty_id} success!`);
         return {
           success: true,
-          message: "List of doctors with shifts",
+          message: "List doctor",
           data: doctorInfo,
         };
       } else {
