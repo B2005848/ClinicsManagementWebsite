@@ -9,8 +9,7 @@ const accountPatientControllers = {
       const last_name = req.body?.last_name;
       const username = req.body?.username;
       const password = req.body?.password;
-      const email = req.body?.email;
-
+      const phone = req.body?.phone;
       if (!first_name && !last_name) {
         return next(new ApiError(400, "Name is required"));
       }
@@ -35,8 +34,8 @@ const accountPatientControllers = {
         first_name: first_name,
         last_name: last_name,
         birthday: birthday,
-        phone_number: username,
-        email: email,
+        phone_number: phone,
+        email: username,
       };
       const resultCreate_account = await accountPatientServices.createAccount(
         accountData,

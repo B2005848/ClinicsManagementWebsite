@@ -33,6 +33,7 @@ const emailService = {
         <h1>Your OTP Code</h1>
         <p>Thank ${patient.first_name} ${patient.last_name} for using our sevice</p>
         <p>Your OTP code is <strong>${otp}</strong></p>
+        <p>Expires in  <strong>5 minute</strong></p>
         <img src="cid:unique@kreata.ee" alt="OTP Image" style="max-width: 100%; height: auto;" />
       </body>
     </html>

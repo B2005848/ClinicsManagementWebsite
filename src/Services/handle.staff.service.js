@@ -220,6 +220,8 @@ const handleStaffService = {
       };
     }
   },
+
+  // ----------------SELECT SHIFT OF DOCTOR BY DEPARTMENT_ID, SPECIALTY_ID AND DOCTOR_ID
 };
 
 module.exports = handleStaffService;
