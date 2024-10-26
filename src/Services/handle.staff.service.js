@@ -226,7 +226,13 @@ const handleStaffService = {
     try {
       // Truy xuất danh sách ca làm việc của bác sĩ dựa vào department_id, specialty_id và doctor_id
       const shifts = await knex("STAFF_SHIFTS as ss")
-        .select("s.shift_name", "ss.shift_date")
+        .select(
+          "s.shift_name",
+          "s.shift_id",
+          "ss.shift_date",
+          "s.start_time",
+          "s.end_time"
+        )
         .join("SHIFTS as s", "s.shift_id", "ss.shift_id")
         .where("ss.staff_id", doctor_id)
         .andWhere("ss.department_id", department_id)
