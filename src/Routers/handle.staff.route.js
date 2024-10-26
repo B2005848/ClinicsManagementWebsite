@@ -16,4 +16,10 @@ router.get(
 
 // ========SEARCH STAFFS=========================
 router.get("/search", handleStaffController.searchStaffs);
+
+// ==========GET DOCTOR SHIFTS BY DEPARTMENT_ID, SPECIALTY_ID, AND DOCTOR_ID==========
+router.get(
+  "/getDoctorShifts/:department_id/:specialty_id/:doctor_id",
+  handleStaffController.getDoctorShifts
+);
 module.exports = router;

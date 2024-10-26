@@ -80,6 +80,33 @@ const handleStaffController = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  // ----------------SELECT SHIFT OF DOCTOR BY DEPARTMENT_ID, SPECIALTY_ID AND DOCTOR_ID----------------
+  async getDoctorShifts(req, res, next) {
+    try {
+      const { department_id, specialty_id, doctor_id } = req.params;
+
+      const result = await handleStaffService.getDoctorShifts(
+        department_id,
+        specialty_id,
+        doctor_id
+      );
+
+      if (result.success === true) {
+        return res.status(200).json({
+          message: result.message,
+          shifts: result.data,
+        });
+      } else {
+        return next(
+          new ApiError(404, "Shifts not found for the specified doctor")
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
 };
 
 module.exports = handleStaffController;

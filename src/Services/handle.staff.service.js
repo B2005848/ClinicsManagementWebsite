@@ -221,7 +221,41 @@ const handleStaffService = {
     }
   },
 
-  // ----------------SELECT SHIFT OF DOCTOR BY DEPARTMENT_ID, SPECIALTY_ID AND DOCTOR_ID
+  // ----------------SELECT SHIFT OF DOCTOR BY DEPARTMENT_ID, SPECIALTY_ID AND DOCTOR_ID----------------
+  async getDoctorShifts(department_id, specialty_id, doctor_id) {
+    try {
+      // Truy xuất danh sách ca làm việc của bác sĩ dựa vào department_id, specialty_id và doctor_id
+      const shifts = await knex("STAFF_SHIFTS as ss")
+        .select("s.shift_name", "ss.shift_date")
+        .join("SHIFTS as s", "s.shift_id", "ss.shift_id")
+        .where("ss.staff_id", doctor_id)
+        .andWhere("ss.department_id", department_id)
+        .andWhere("ss.specialty_id", specialty_id);
+
+      // Kiểm tra nếu không có ca làm việc nào
+      if (shifts.length === 0) {
+        console.log("No shifts found for the specified doctor!");
+        return {
+          success: false,
+          message: "No shifts found for the specified doctor",
+        };
+      }
+
+      console.log(`Get shifts for doctor ${doctor_id} success!`);
+      return {
+        success: true,
+        message: "Doctor shift list",
+        data: shifts,
+      };
+    } catch (error) {
+      console.error("Error during get doctor shifts:", error);
+      return {
+        success: false,
+        message: "Error during get doctor shifts",
+        error: error.message,
+      };
+    }
+  },
 };
 
 module.exports = handleStaffService;
