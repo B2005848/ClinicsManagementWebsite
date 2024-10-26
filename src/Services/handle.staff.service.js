@@ -228,11 +228,12 @@ const handleStaffService = {
       const shifts = await knex("STAFF_SHIFTS as ss")
         .select(
           "s.shift_name",
-          "s.shift_id",
+          knex.raw("TRIM(s.shift_id) as shift_id"),
           "ss.shift_date",
           "s.start_time",
           "s.end_time"
         )
+
         .join("SHIFTS as s", "s.shift_id", "ss.shift_id")
         .where("ss.staff_id", doctor_id)
         .andWhere("ss.department_id", department_id)
