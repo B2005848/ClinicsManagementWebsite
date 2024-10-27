@@ -59,13 +59,14 @@ const handleAppointmentController = {
   async TimeBookingExisting(req, res, next) {
     try {
       const filterData = {
-        doctor_id: req.body.doctor_id,
-        department_id: req.body.department_id,
-        service_id: req.body.service_id,
-        appointment_date: req.body.appointment_date,
-        start_time: req.body.start_time,
-        shift_id: req.body.shift_id,
+        doctor_id: req.query.doctor_id,
+        department_id: req.query.department_id,
+        service_id: req.query.service_id,
+        appointment_date: req.query.appointment_date,
+        start_time: req.query.start_time,
+        shift_id: req.query.shift_id,
       };
+      console.log("Filter Data:", filterData);
 
       const result = await handleAppointmentService.TimeBookingExisting(
         filterData
