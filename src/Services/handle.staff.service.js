@@ -229,7 +229,8 @@ const handleStaffService = {
         .select(
           "s.shift_name",
           knex.raw("TRIM(s.shift_id) as shift_id"),
-          "ss.shift_date",
+          "ss.shift_date as start_shift",
+          "ss.shift_end_date as end_shift",
           "s.start_time",
           "s.end_time"
         )
