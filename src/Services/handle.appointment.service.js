@@ -74,6 +74,46 @@ const handleBookingService = {
       throw error;
     }
   },
+
+  // Lọc giờ được chọn bởi id doctor, id_department, id_service, appointment_date, start_time, shift_id buổi sáng hoặc chiều (Lọc lịch hẹn trùng để nguồi dùng không booking được)
+  async TimeBookingExisting({
+    doctor_id,
+    department_id,
+    service_id,
+    appointment_date,
+    start_time,
+    shift_id,
+  }) {
+    try {
+      const existingTimes = await knex("APPOINTMENTS")
+        .select("start_time")
+        .where("staff_id", doctor_id)
+        .andWhere("department_id", department_id)
+        .andWhere("service_id", service_id)
+        .andWhere("appointment_date", appointment_date)
+        .andWhere("shift_id", shift_id)
+        .andWhere("start_time", start_time);
+
+      if (existingTimes.length > 0) {
+        return {
+          status: false,
+          message: "Khung giờ này đã có người đặt.",
+          data: existingTimes,
+        };
+      } else {
+        return {
+          status: true,
+          message: "Khung giờ này còn trống và có thể đặt lịch.",
+        };
+      }
+    } catch (error) {
+      console.error("Lỗi khi kiểm tra thời gian đặt lịch:", error);
+      return {
+        status: false,
+        message: "Lỗi hệ thống",
+      };
+    }
+  },
 };
 
 module.exports = handleBookingService;
