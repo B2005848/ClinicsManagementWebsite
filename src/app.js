@@ -4,9 +4,9 @@ const cors = require("cors");
 // =============ROUTER FOR UPLOAD FILE==========>
 const upLoadFileRoutes = require("./Routers/upload.route");
 // =============ROUTER FOR PATIENTS==============>
-const emailPatientRoutes = require("./Routers/email.router");
+const emailPatientRoutes = require("./Routers/email.route");
 const routerAccountPatient = require("./Routers/account.patients.route");
-const routerPatient = require("./Routers/handle.patient.router");
+const routerPatient = require("./Routers/handle.patient.route");
 
 // ============ROUTER FOR STAFFS=================>
 const routerAccountStaff = require("./Routers/account.staff.route");
@@ -22,7 +22,10 @@ const routerBooking = require("./Routers/handle.appointment.route");
 const routerDepartments = require("./Routers/handle.department.route");
 
 //==========ROUTER FOR API SERVICE MANAGEMENTS======>
-const routerServices = require("./Routers/handle.service.router");
+const routerServices = require("./Routers/handle.service.route");
+
+//==========ROUTER FOR API PAYMENT METHOD============>
+const routerPaymentMethod = require("./Routers/handle.paymentmethod.route");
 const {
   resourceNotFound,
   methodNotAllowed,
@@ -77,6 +80,9 @@ app.use("/api/departments", routerDepartments);
 
 //----------------------API FOR SERVICES--------------
 app.use("/api/services", routerServices);
+
+//--------------------API FOR PAYTMENT METHOD-----------
+app.use("/api/payment-method", routerPaymentMethod);
 
 //-----------------------API FOR UPLOAD FILE----------
 app.use("/api/file", upLoadFileRoutes);
