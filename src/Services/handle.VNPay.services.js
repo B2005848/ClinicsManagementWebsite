@@ -118,6 +118,7 @@ const handleVNPAYServices = {
           patient_id,
           prescription_id,
           payment_method_id,
+          bankCode,
           amount,
           payment_status: "P", // P: Pending
         })
@@ -131,7 +132,7 @@ const handleVNPAYServices = {
 
     // Tạo các tham số VNPay
     const vnp_TxnRef = transaction_id; // Sử dụng transaction_id làm tham chiếu
-    const vnp_OrderInfo = `Thanh toan don thuoc ${prescription_id}`;
+    const vnp_OrderInfo = `Thanh-toan-don-thuoc-${prescription_id}`;
     const vnp_CreateDate = `${date.getFullYear()}${(
       "0" +
       (date.getMonth() + 1)
@@ -144,14 +145,14 @@ const handleVNPAYServices = {
     let vnp_Params = {
       vnp_Version: "2.1.0",
       vnp_Command: "pay",
-      vnp_TmnCode: vnp_TmnCode,
+      vnp_TmnCode: VNP_TMNCODE,
       vnp_Amount: amount * 100, // VNPay yêu cầu số tiền nhân với 100
       vnp_CurrCode: "VND",
       vnp_TxnRef: vnp_TxnRef,
       vnp_OrderInfo: vnp_OrderInfo,
       vnp_OrderType: "billpayment",
       vnp_Locale: "vn",
-      vnp_ReturnUrl: vnp_ReturnUrl,
+      vnp_ReturnUrl: VNP_RETURNURL,
       vnp_IpAddr: ipAddr,
       vnp_CreateDate: vnp_CreateDate,
     };
@@ -168,13 +169,13 @@ const handleVNPAYServices = {
     console.log("Sorted Params:", vnp_Params); // Kiểm tra các tham số sau khi sắp xếp
     // Tạo chữ ký cho yêu cầu thanh toán
     const signData = querystring.stringify(vnp_Params);
-    const hmac = crypto.createHmac("sha512", vnp_HashSecret);
+    const hmac = crypto.createHmac("sha512", VNP_HASHSECRET);
     const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
     vnp_Params["vnp_SecureHash"] = signed;
     console.log("Signed Hash:", signed); // Kiểm tra chữ ký
 
     // Tạo URL chuyển hướng người dùng sang VNPay
-    const paymentUrl = `${vnp_Url}?${querystring.stringify(vnp_Params)}`;
+    const paymentUrl = `${VNP_URL}?${querystring.stringify(vnp_Params)}`;
     console.log("Final Payment URL:", paymentUrl); // Kiểm tra URL thanh toán đầy đủ
     return paymentUrl;
   },
