@@ -28,17 +28,19 @@ const handleBookingService = {
       }
 
       // If dont exits
-      const resultBooking = await knex("APPOINTMENTS").insert(bookingData);
+      const [resultBooking] = await knex("APPOINTMENTS")
+        .insert(bookingData)
+        .returning("appointment_id");
 
       if (resultBooking) {
         console.log(
-          `Booking ID: ${resultBooking[0]} has been successfully booked`,
+          `Booking ID: ${resultBooking} has been successfully booked`,
           [resultBooking]
         );
         return {
           status: true,
           message: "Booking Successful",
-          data: resultBooking[0],
+          data: resultBooking,
         };
       } else {
         return {

@@ -5,14 +5,7 @@ const paymentVNPayController = {
   // --------------------------- Tạo URL thanh toán cho lịch hẹn --------------------------
   async createVNPayPaymentForAppointment(req, res, next) {
     try {
-      const {
-        amount,
-        bankCode,
-        ipAddr,
-        patient_id,
-        appointment_id,
-        payment_method_id,
-      } = req.body;
+      const { amount, bankCode, ipAddr, patient_id, appointment_id } = req.body;
 
       // Gọi service để tạo URL thanh toán
       const paymentUrl =
@@ -21,8 +14,7 @@ const paymentVNPayController = {
           bankCode,
           ipAddr,
           patient_id,
-          appointment_id,
-          payment_method_id
+          appointment_id
         );
 
       // Trả về URL thanh toán cho client

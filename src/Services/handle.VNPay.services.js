@@ -17,8 +17,7 @@ const handleVNPAYServices = {
     bankCode,
     ipAddr,
     patient_id,
-    appointment_id,
-    payment_method_id
+    appointment_id
   ) {
     const date = new Date();
 
@@ -29,13 +28,15 @@ const handleVNPAYServices = {
         .insert({
           patient_id,
           appointment_id,
-          payment_method_id,
+          payment_method_id: 2,
           bankCode,
           amount,
           payment_status: "P", // P: Pending
         })
         .returning("transaction_id");
-
+      await knex("APPOINTMENTS")
+        .where("appointment_id", appointment_id)
+        .update("payment_method_id", 2);
       transaction_id = transaction.transaction_id;
     } catch (error) {
       console.error("Error inserting appointment transaction:", error);
