@@ -2,6 +2,133 @@ const { knex } = require("../../db.config");
 require("dotenv").config();
 
 const handleBookingService = {
+  // Lấy thông tin tất cả lịch hẹn
+  async getAppointmentList(page) {
+    try {
+      const itemsPerPage = 10; // Số lượng lịch hẹn trên mỗi trang
+      const offset = (page - 1) * itemsPerPage; // Tính offset dựa trên số trang
+
+      // Lấy tổng số lượng lịch hẹn
+      const totalAppointments = await knex("APPOINTMENTS")
+        .count("* as totalCount")
+        .first();
+      const totalAppointmentsCount = totalAppointments.totalCount;
+
+      // Tính tổng số trang
+      const totalPages = Math.ceil(totalAppointmentsCount / itemsPerPage);
+
+      // Kiểm tra nếu trang yêu cầu vượt quá tổng số trang
+      if (page > totalPages) {
+        return {
+          status: false,
+          message: `Trang ${page} vượt quá số trang tối đa (${totalPages}). Không có lịch hẹn nào.`,
+          totalPages,
+          appointmentList: [],
+        };
+      }
+
+      // Lấy danh sách lịch hẹn theo trang
+      const appointmentList = await knex("APPOINTMENTS as ap")
+        .select(
+          "ap.appointment_id",
+          "ap.patient_id",
+          "ap.staff_id",
+          "ap.department_id",
+          "ap.service_id",
+          "ap.appointment_date",
+          "ap.start_time",
+          "ap.end_time",
+          "ap.status",
+          "ap.reason",
+          "ap.created_at",
+          "ap.updated_at"
+        )
+        .orderBy("ap.appointment_id", "asc")
+        .limit(itemsPerPage)
+        .offset(offset);
+
+      // Kiểm tra nếu danh sách lịch hẹn trống
+      if (appointmentList.length === 0) {
+        console.log(
+          "Danh sách lịch hẹn trống. Kiểm tra lại cơ sở dữ liệu hoặc liên hệ admin."
+        );
+        return {
+          status: false,
+          message: "Danh sách lịch hẹn trống",
+          totalPages,
+          appointmentList,
+          itemsPerPage,
+        };
+      } else {
+        console.log(
+          `Lấy danh sách lịch hẹn thành công. Tổng số lịch hẹn: ${totalAppointmentsCount}`
+        );
+        console.log("Phản hồi từ getAppointmentList:", {
+          appointmentList,
+          totalPages,
+          itemsPerPage,
+        });
+        return {
+          status: true,
+          message: "Danh sách lịch hẹn lấy thành công",
+          totalPages,
+          appointmentList,
+          itemsPerPage,
+        };
+      }
+    } catch (error) {
+      console.error("Lỗi trong quá trình lấy danh sách lịch hẹn:", error);
+      throw error;
+    }
+  },
+
+  // Lấy thông tin lịch hẹn theo patient_id
+  async getAppointmentsByPatientId(patient_id) {
+    try {
+      const appointments = await knex("APPOINTMENTS as ap")
+        .select(
+          "ap.appointment_id",
+          "ap.created_at",
+          "ap.staff_id",
+          "sd.first_name",
+          "sd.last_name",
+          "ap.department_id",
+          "dep.department_name",
+          "ap.service_id",
+          "se.service_name",
+          "se.service_fee",
+          "ap.appointment_date",
+          "ap.start_time",
+          "ap.end_time",
+          "ap.status"
+        )
+        .join("STAFF_DETAILS as sd", "sd.staff_id", "ap.staff_id")
+        .join("DEPARTMENTS as dep", "dep.department_id", "ap.department_id")
+        .join("SERVICES as se", "se.service_id", "ap.service_id")
+        .where("patient_id", patient_id);
+
+      if (appointments.length > 0) {
+        return {
+          status: true,
+          message: "Appointments retrieved successfully",
+          data: appointments,
+        };
+      } else {
+        return {
+          status: false,
+          message: "No appointments found for this patient",
+        };
+      }
+    } catch (error) {
+      console.error("Error fetching appointments by patient ID:", error);
+      return {
+        status: false,
+        message: "Internal Server Error",
+      };
+    }
+  },
+
+  // Đặt hẹn
   async AppointmentBooking(bookingData) {
     try {
       // Check appointment exits by start_time, end_time, doctor_id

@@ -2,6 +2,61 @@ const ApiError = require("../api-error");
 const handleAppointmentService = require("../Services/handle.appointment.service");
 
 const handleAppointmentController = {
+  // Lấy danh sách lịch hẹn với phân trang
+  async getAppointmentList(req, res, next) {
+    try {
+      // Lấy trang từ query, mặc định là trang 1 nếu không có giá trị
+      const page = parseInt(req.query.page) || 1;
+
+      // Gọi hàm getAppointmentList trong service
+      const result = await handleAppointmentService.getAppointmentList(page);
+
+      // Kiểm tra kết quả và gửi phản hồi
+      if (result.status === true) {
+        res.status(200).json({
+          message: result.message,
+          totalPages: result.totalPages,
+          appointmentList: result.appointmentList,
+          itemsPerPage: result.itemsPerPage,
+        });
+      } else {
+        res.status(204).json({
+          message: result.message,
+          totalPages: result.totalPages,
+          appointmentList: result.appointmentList,
+        });
+      }
+    } catch (error) {
+      return next(new ApiError(500, "Lỗi máy chủ nội bộ"));
+    }
+  },
+
+  // Lấy thông tin lịch hen theo patient_id
+  async getAppointmentsByPatientId(req, res, next) {
+    try {
+      const patient_id = req.params.patient_id; // Get patient_id from route parameters
+
+      const result = await handleAppointmentService.getAppointmentsByPatientId(
+        patient_id
+      );
+
+      if (result.status === true) {
+        res.json({
+          status: result.status,
+          message: result.message,
+          data: result.data,
+        });
+      } else {
+        res.json({
+          status: result.status,
+          message: result.message,
+        });
+      }
+    } catch (error) {
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
+
   //BOOKING
   async AppointmentBooking(req, res, next) {
     try {
