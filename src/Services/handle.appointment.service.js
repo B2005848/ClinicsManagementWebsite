@@ -100,12 +100,15 @@ const handleBookingService = {
           "ap.appointment_date",
           "ap.start_time",
           "ap.end_time",
-          "ap.status"
+          "ap.status",
+          "t.payment_status",
+          "t.bankCode"
         )
         .join("STAFF_DETAILS as sd", "sd.staff_id", "ap.staff_id")
         .join("DEPARTMENTS as dep", "dep.department_id", "ap.department_id")
         .join("SERVICES as se", "se.service_id", "ap.service_id")
-        .where("patient_id", patient_id);
+        .join("TRANSACTIONS as t", "t.appointment_id", "ap.appointment_id")
+        .where("ap.patient_id", patient_id);
 
       if (appointments.length > 0) {
         return {
