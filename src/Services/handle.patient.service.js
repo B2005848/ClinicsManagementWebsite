@@ -111,9 +111,11 @@ const handlePatientService = {
       const patients = await knex("PATIENT_ACCOUNTS as pa")
         .select(
           "pa.*",
-          "pd.first_name as firstname",
+          "pd.first_name",
           "pd.last_name",
-          "pd.citizen_id"
+          "pd.email",
+          "pd.citizen_id",
+          "pd.birthday"
         )
         .join("PATIENT_DETAILS as pd", "pa.patient_id", "pd.patient_id")
         .where("pa.patient_id", "like", `%${query}%`)
