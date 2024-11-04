@@ -10,7 +10,18 @@ const { VNP_TMNCODE, VNP_HASHSECRET, VNP_URL, VNP_RETURNURL } = process.env;
 // console.log("VNP_HASHSECRET:", process.env.VNP_HASHSECRET);
 // console.log("VNP_URL:", process.env.VNP_URL);
 // console.log("VNP_RETURNURL:", process.env.VNP_RETURNURL);
+function dateFormat(date) {
+  return `${date.getFullYear()}${("0" + (date.getMonth() + 1)).slice(-2)}${(
+    "0" + date.getDate()
+  ).slice(-2)}${("0" + date.getHours()).slice(-2)}${(
+    "0" + date.getMinutes()
+  ).slice(-2)}${("0" + date.getSeconds()).slice(-2)}`;
+}
 
+function getDateInGMT7(date) {
+  const offset = 7 * 60; // GMT+7 in minutes
+  return new Date(date.getTime() + offset * 60 * 1000);
+}
 const handleVNPAYServices = {
   async createVNPayPaymentForAppointment(
     amount,
@@ -214,9 +225,11 @@ const handleVNPAYServices = {
     }
   },
 
-  // Hàm hủy giao dịch
+  // Hàm hủy giao dịch, trả về URL hoàn tiền
   async cancelTransaction(transaction_id, reason) {
     try {
+      const date = new Date();
+
       // Tìm giao dịch cần hủy trong SQL Server qua Knex
       const transaction = await knex("TRANSACTIONS")
         .where({ transaction_id })
@@ -226,21 +239,101 @@ const handleVNPAYServices = {
         return { code: "404", message: "Transaction not found" };
       }
 
-      // Cập nhật trạng thái giao dịch thành 'X' (Cancelled)
-      await knex("TRANSACTIONS").where({ transaction_id }).update({
-        payment_status: "X", // X: Cancelled
-        updated_at: new Date(),
-      });
+      const orderCreatedAt = dateFormat(
+        getDateInGMT7(new Date(transaction.created_at))
+      );
+      const vnp_TxnRef = String(transaction_id);
 
-      console.log(`Transaction ${transaction_id} cancelled. Reason: ${reason}`);
+      const vnp_CreateDate = dateFormat(getDateInGMT7(date));
 
-      return { code: "00", message: "Transaction cancelled successfully" };
+      // Tạo các tham số cho yêu cầu hoàn tiền
+      let refundParams = {
+        vnp_Version: "2.1.0",
+        vnp_Command: "refund",
+        vnp_TmnCode: VNP_TMNCODE,
+        vnp_RequestId: transaction_id.toString(),
+        vnp_Amount: transaction.amount * 100, // Số tiền cần hoàn lại (nhân với 100)
+        vnp_TransactionDate: orderCreatedAt, // Ngày tạo giao dịch gốc
+        vnp_CreateBy: "System",
+        vnp_OrderInfo: `Hoan-tien-giao-dich-${transaction_id}`,
+        vnp_TxnRef: vnp_TxnRef,
+        vnp_Locale: "vn",
+        vnp_IpAddr: "192.168.1.2",
+        vnp_CreateDate: vnp_CreateDate,
+      };
+
+      // Sắp xếp các tham số và ký tên
+      refundParams = this.sortObject(refundParams);
+      const signData = querystring.stringify(refundParams);
+      const hmac = crypto.createHmac("sha512", VNP_HASHSECRET);
+      const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
+      refundParams["vnp_SecureHash"] = signed;
+
+      // Tạo URL gọi API hoàn tiền của VNPay
+      const refundUrl = `${VNP_URL}?${querystring.stringify(refundParams)}`;
+      console.log("Refund URL:", refundUrl);
+
+      // Gọi API hoàn tiền thực sự
+      const response = await fetch(refundUrl);
+      const textResponse = await response.text();
+      console.log("VNPay Response:", textResponse);
+
+      // Xử lý khi phản hồi là HTML
+      if (textResponse.includes("<!DOCTYPE html>")) {
+        console.error(
+          "Received an HTML response from VNPay, indicating an error."
+        );
+        return {
+          code: "99",
+          message:
+            "VNPay returned an error page. Please check the parameters or contact support.",
+        };
+      }
+
+      let refundResult;
+      try {
+        refundResult = JSON.parse(textResponse);
+      } catch (error) {
+        console.error("Error parsing VNPay response as JSON:", error);
+        return {
+          code: "99",
+          message: "Error parsing VNPay response as JSON",
+          error,
+        };
+      }
+
+      if (refundResult.code === "00") {
+        await knex("TRANSACTIONS").where({ transaction_id }).update({
+          payment_status: "R",
+          cancel_reason: reason,
+          updated_at: new Date(),
+        });
+
+        console.log(`Transaction ${transaction_id} refunded successfully.`);
+        return {
+          code: "00",
+          message: "Transaction refunded successfully",
+        };
+      } else {
+        console.error("Refund failed:", refundResult.message);
+        return {
+          code: refundResult.code,
+          message: "Refund failed",
+          details: refundResult,
+        };
+      }
     } catch (error) {
-      console.error("Error cancelling transaction:", error);
-      return { code: "99", message: "Error cancelling transaction", error };
+      console.error(
+        "Error creating refund URL and updating transaction:",
+        error
+      );
+      return {
+        code: "99",
+        message: "Error cancelling and refunding transaction",
+        error,
+      };
     }
   },
-
   // Hàm sắp xếp các object theo thứ tự bảng chữ cái
   sortObject(obj) {
     const sorted = {};

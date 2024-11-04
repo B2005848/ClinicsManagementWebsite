@@ -142,6 +142,29 @@ const handleAppointmentController = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  // Xóa lịch hẹn
+  async deleteAppointment(req, res, next) {
+    try {
+      const appointment_id = req.params.id; // Get appointment ID from route parameters
+
+      const result = await handleAppointmentService.deleteAppointment(
+        appointment_id
+      );
+
+      if (result.status === true) {
+        res.status(200).json({
+          message: result.message,
+        });
+      } else {
+        res.status(404).json({
+          message: result.message,
+        });
+      }
+    } catch (error) {
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
 };
 
 module.exports = handleAppointmentController;

@@ -246,6 +246,38 @@ const handleBookingService = {
       };
     }
   },
+
+  // Xóa lịch hẹn
+  async deleteAppointment(appointment_id) {
+    try {
+      const deletedTransaction = await knex("TRANSACTIONS")
+        .where("appointment_id", appointment_id)
+        .del();
+
+      if (deletedTransaction > 0) {
+        const deletedCount = await knex("APPOINTMENTS")
+          .where("appointment_id", appointment_id)
+          .del();
+        if (deletedCount > 0) {
+          return {
+            status: true,
+            message: "Appointment deleted successfully",
+          };
+        } else {
+          return {
+            status: false,
+            message: "Appointment not found or could not be deleted",
+          };
+        }
+      }
+    } catch (error) {
+      console.error("Error while deleting appointment:", error);
+      return {
+        status: false,
+        message: "Internal Server Error",
+      };
+    }
+  },
 };
 
 module.exports = handleBookingService;

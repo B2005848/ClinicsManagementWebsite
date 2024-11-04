@@ -24,4 +24,8 @@ router.get(
   "/getinformation/:patient_id",
   handleAppointmentController.getAppointmentsByPatientId
 );
+
+// Endpoint to delete a appointment by id
+router.delete("/delete/:id", handleAppointmentController.deleteAppointment);
+
 module.exports = router;

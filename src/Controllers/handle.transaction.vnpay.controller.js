@@ -74,6 +74,14 @@ const paymentVNPayController = {
     try {
       const { transaction_id, reason } = req.body;
 
+      // Kiểm tra dữ liệu đầu vào
+      if (!transaction_id || !reason) {
+        return res.status(400).json({
+          code: "01",
+          message: "Transaction ID and reason are required",
+        });
+      }
+
       // Gọi service để hủy giao dịch
       const result = await handleVNPAYServices.cancelTransaction(
         transaction_id,
@@ -81,9 +89,18 @@ const paymentVNPayController = {
       );
 
       // Trả về kết quả cho client
-      res.status(200).json(result);
+      if (result.code === "00") {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json({
+          code: result.code,
+          message: result.message,
+          details: result.details || null,
+        });
+      }
     } catch (error) {
-      next(new ApiError(400, "Error cancelling transaction"));
+      console.error("Error cancelling transaction:", error);
+      next(new ApiError(500, `Error cancelling transaction: ${error.message}`));
     }
   },
 };
