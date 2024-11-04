@@ -55,8 +55,10 @@ const handlePatientService = {
   // ---------------GET INFORMATION OF PATIENT WITH PATIENT ID----------------
   async getPatientByUsername(patient_id) {
     try {
-      const data = await knex("PATIENT_DETAILS")
-        .where("patient_id", patient_id)
+      const data = await knex("PATIENT_DETAILS as pd")
+        .select("pd.*", "pa.status as statusAccount")
+        .join("PATIENT_ACCOUNTS as pa", "pa.patient_id", "pd.patient_id")
+        .where("pd.patient_id", patient_id)
         .first();
       if (data) {
         return data;

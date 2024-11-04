@@ -32,9 +32,15 @@ const handleBookingService = {
         .select(
           "ap.appointment_id",
           "ap.patient_id",
+          "pd.first_name as patient_firstname",
+          "pd.last_name as patient_lastname",
           "ap.staff_id",
+          "sd.first_name as doctor_firstname",
+          "sd.last_name as doctor_lastname",
           "ap.department_id",
+          "dep.department_name",
           "ap.service_id",
+          "se.service_name",
           "ap.appointment_date",
           "ap.start_time",
           "ap.end_time",
@@ -43,6 +49,10 @@ const handleBookingService = {
           "ap.created_at",
           "ap.updated_at"
         )
+        .join("PATIENT_DETAILS as pd", "pd.patient_id", "ap.patient_id")
+        .join("STAFF_DETAILS as sd", "sd.staff_id", "ap.staff_id")
+        .join("DEPARTMENTS as dep", "dep.department_id", "ap.department_id")
+        .join("SERVICES as se", "se.service_id", "ap.service_id")
         .orderBy("ap.appointment_id", "asc")
         .limit(itemsPerPage)
         .offset(offset);
