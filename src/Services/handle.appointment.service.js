@@ -44,7 +44,7 @@ const handleBookingService = {
           "ap.appointment_date",
           "ap.start_time",
           "ap.end_time",
-          "ap.status",
+          knex.raw("TRIM(ap.status) as status"),
           "ap.reason",
           "ap.created_at",
           "ap.updated_at"
@@ -110,7 +110,8 @@ const handleBookingService = {
           "ap.appointment_date",
           "ap.start_time",
           "ap.end_time",
-          "ap.status",
+          knex.raw("TRIM(ap.status) as status"),
+          "t.payment_method_id",
           "t.payment_status",
           "t.bankCode"
         )
