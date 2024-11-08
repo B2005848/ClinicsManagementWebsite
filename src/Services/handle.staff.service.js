@@ -86,6 +86,7 @@ const handleStaffService = {
       const staffInfo = await knex("STAFF_ACCOUNTS as sa")
         .select(
           "sd.*",
+          "r.role_id",
           "r.role_name as role_name",
           "sa.status as statusAccount"
         )

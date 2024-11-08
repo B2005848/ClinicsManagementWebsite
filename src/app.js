@@ -15,11 +15,17 @@ const routerStaff = require("./Routers/handle.staff.route");
 //============== ROUTER FOR SHIFT===============
 const routerShift = require("./Routers/handle.shift.route");
 
+//============== ROUTER FOR ROLES===============
+const routerRoles = require("./Routers/handle.roles.route");
+
 //============ROUTER FOR SERVICE BOOKING=========>
 const routerBooking = require("./Routers/handle.appointment.route");
 
 //===========ROUTER FOR API DEPARTMENTS========>
 const routerDepartments = require("./Routers/handle.department.route");
+
+//===========ROUTER FOR API SPECIALTIES========>
+const routerSpecialties = require("./Routers/handle.specialties.route");
 
 //==========ROUTER FOR API SERVICE MANAGEMENTS======>
 const routerServices = require("./Routers/handle.service.route");
@@ -75,11 +81,17 @@ app.use("/api/handle/staff", routerStaff);
 //---------------------API FOR SHIFTS--------------------
 app.use("/api/shifts", routerShift);
 
+//--------------------API FOR ROLES---------------------
+app.use("/api/roles", routerRoles);
+
 //---------------------API FOR APPOINTMENTS----------------
 app.use("/api/appointment", routerBooking);
 
 //----------------------API FOR DEPARTMENTS--------------
 app.use("/api/departments", routerDepartments);
+
+//----------------------API FOR SPECIALTIES--------------
+app.use("/api/specialties", routerSpecialties);
 
 //----------------------API FOR SERVICES--------------
 app.use("/api/services", routerServices);
