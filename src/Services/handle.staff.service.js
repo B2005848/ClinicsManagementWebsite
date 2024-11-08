@@ -265,6 +265,40 @@ const handleStaffService = {
       };
     }
   },
+
+  // ---------------------------THÊM CHUYÊN KHOA CHO NHÂN VIÊN---------------------------
+  async addSpecialtiesForStaff(staffId, specialtyIds) {
+    try {
+      // Kiểm tra nếu specialtyIds là một mảng
+      if (!Array.isArray(specialtyIds)) {
+        throw new Error("specialtyIds phải là một mảng chứa các specialty_id");
+      }
+
+      // Chuẩn bị dữ liệu để chèn vào bảng STAFF_SPECIALTY
+      const specialtiesToAdd = specialtyIds.map((specialtyId) => ({
+        staff_id: staffId,
+        specialty_id: specialtyId,
+        created_at: new Date(),
+        updated_at: new Date(),
+      }));
+
+      // Chèn dữ liệu vào bảng
+      await knex("STAFF_SPECIALTY").insert(specialtiesToAdd);
+
+      console.log(`Đã thêm chuyên khoa cho nhân viên ${staffId} thành công!`);
+      return {
+        success: true,
+        message: "Chuyên khoa đã được thêm cho nhân viên.",
+      };
+    } catch (error) {
+      console.error("Lỗi khi thêm chuyên khoa cho nhân viên:", error);
+      return {
+        success: false,
+        message: "Lỗi khi thêm chuyên khoa cho nhân viên.",
+        error: error.message,
+      };
+    }
+  },
 };
 
 module.exports = handleStaffService;
