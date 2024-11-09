@@ -15,7 +15,6 @@ const accountStaffController = {
           staff_id,
           password,
           role_id,
-          specialty_id,
           first_name,
           last_name,
           citizen_id,
@@ -24,6 +23,10 @@ const accountStaffController = {
           email,
           address_contact,
           birthday,
+          work_contract,
+          nation,
+          religion,
+          nationality,
         } = account;
 
         if (!password) {
@@ -45,8 +48,8 @@ const accountStaffController = {
           password: password,
           role_id: role_id,
         };
+
         const staff_detailsData = {
-          specialty_id: specialty_id,
           first_name: first_name,
           last_name: last_name,
           birthday: formattedBirthday,
@@ -55,6 +58,10 @@ const accountStaffController = {
           phone_number: phone_number,
           email: email,
           address_contact: address_contact,
+          work_contract: work_contract,
+          nation: nation,
+          religion: religion,
+          nationality: nationality,
         };
 
         const resultCreate_account = await accountStaffService.createAccount(
@@ -64,11 +71,12 @@ const accountStaffController = {
 
         results.push(resultCreate_account);
       }
-
-      return res.status(200).json({
-        message: "create accounts success",
-        data: results,
-      });
+      if (results.length > 0) {
+        return res.status(200).json({
+          message: "create accounts success",
+          data: results,
+        });
+      }
     } catch (error) {
       console.log(error);
       return next(new ApiError(500, "Internal Server Error"));

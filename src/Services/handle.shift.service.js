@@ -32,7 +32,7 @@ const handleShiftService = {
           "sh.created_at",
           "sh.updated_at"
         )
-        .orderBy("sh.shift_id", "asc")
+        .orderBy("sh.shift_id", "desc")
         .limit(itemsPerPage)
         .offset(offset);
       if (

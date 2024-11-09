@@ -22,4 +22,10 @@ router.get(
   "/getDoctorShifts/:department_id/:specialty_id/:doctor_id",
   handleStaffController.getDoctorShifts
 );
+
+// ==========ADD SPECIALTIES FOR STAFF==========
+router.post(
+  "/addSpecialtiesForStaff/:id",
+  handleStaffController.addSpecialtiesForStaff
+);
 module.exports = router;

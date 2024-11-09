@@ -278,8 +278,6 @@ const handleStaffService = {
       const specialtiesToAdd = specialtyIds.map((specialtyId) => ({
         staff_id: staffId,
         specialty_id: specialtyId,
-        created_at: new Date(),
-        updated_at: new Date(),
       }));
 
       // Chèn dữ liệu vào bảng
@@ -295,6 +293,44 @@ const handleStaffService = {
       return {
         success: false,
         message: "Lỗi khi thêm chuyên khoa cho nhân viên.",
+        error: error.message,
+      };
+    }
+  },
+
+  // Thêm ca làm việc cho nhân viên
+  async addShiftsForStaff(staffId, shifts) {
+    try {
+      // Kiểm tra nếu shifts là một mảng
+      if (!Array.isArray(shifts)) {
+        throw new Error("Shifts phải là một mảng chứa các ca làm việc.");
+      }
+
+      // Chuẩn bị dữ liệu để chèn vào bảng staff_shifts
+      const shiftsToAdd = shifts.map((shift) => ({
+        staff_id: staffId,
+        shift_id: shift.shift_id,
+        shift_date: shift.shift_date,
+        shift_end_date: shift.shift_end_date,
+        department_id: shift.department_id,
+        specialty_id: shift.specialty_id,
+      }));
+
+      // Chèn dữ liệu vào bảng staff_shifts
+      await knex("staff_shifts").insert(shiftsToAdd);
+
+      console.log(
+        `Đã thêm các ca làm việc cho nhân viên ${staffId} thành công!`
+      );
+      return {
+        success: true,
+        message: "Các ca làm việc đã được thêm cho nhân viên.",
+      };
+    } catch (error) {
+      console.error("Lỗi khi thêm ca làm việc cho nhân viên:", error);
+      return {
+        success: false,
+        message: "Lỗi khi thêm ca làm việc cho nhân viên.",
         error: error.message,
       };
     }

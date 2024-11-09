@@ -107,6 +107,30 @@ const handleStaffController = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  // ---------------------------THÊM CHUYÊN KHOA CHO NHÂN VIÊN---------------------------
+  async addSpecialtiesForStaff(req, res, next) {
+    try {
+      const staffId = req.params.id;
+      const { specialtyIds } = req.body;
+
+      const result = await handleStaffService.addSpecialtiesForStaff(
+        staffId,
+        specialtyIds
+      );
+
+      if (result.success === true) {
+        return res.status(200).json({
+          message: result.message,
+        });
+      } else {
+        return next(new ApiError(400, result.message));
+      }
+    } catch (error) {
+      console.log(error);
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
 };
 
 module.exports = handleStaffController;
