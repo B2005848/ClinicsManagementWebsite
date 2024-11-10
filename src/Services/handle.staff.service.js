@@ -131,9 +131,11 @@ const handleStaffService = {
           "sd.first_name as first_name",
           "sd.last_name as last_name",
           "sd.citizen_id",
-          "sd.email as email"
+          "sd.email as email",
+          "r.role_name"
         )
         .join("STAFF_DETAILS as sd", "sd.staff_id", "sa.staff_id")
+        .join("ROLES as r", "r.role_id", "sa.role_id")
         .where("sa.staff_id", "like", `%${query}%`)
         .orWhere("sd.first_name", "like", `%${query}%`)
         .orWhere("sd.last_name", "like", `%${query}%`)
