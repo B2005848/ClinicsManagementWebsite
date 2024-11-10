@@ -24,4 +24,10 @@ router.patch("/modify/:id", handleDepartmentController.modifyDepartment);
 
 // ========SEARCH DEPARTMENTS=========================
 router.get("/search", handleDepartmentController.searchDepartments);
+
+// ========GET DEPARTMENTS BY SPECIALTY=========================
+router.get(
+  "/specialty/:specialtyId",
+  handleDepartmentController.getDepartmentsBySpecialty
+);
 module.exports = router;

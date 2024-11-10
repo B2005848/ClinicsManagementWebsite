@@ -1,5 +1,4 @@
 const { knex } = require("../../db.config");
-const handleDepartmentController = require("../Controllers/handle.department.controller");
 
 const handleDepartment = {
   //----------------------------------------------GET LIST DEPARTMENTS FOR ADMIN--------------------------------
@@ -220,6 +219,42 @@ const handleDepartment = {
       return {
         status: false,
         message: "Error during search deparments",
+        error: error.message,
+      };
+    }
+  },
+
+  //------------------- GET DEPARTMENTS BY SPECIALTY --------------------
+  async getDepartmentsBySpecialty(specialtyId) {
+    try {
+      // Truy vấn để lấy danh sách phòng ban có liên quan đến `specialty_id` từ bảng SERVICES
+      const departments = await knex("SERVICES as s")
+        .distinct("d.department_id", "d.department_name")
+        .join("DEPARTMENTS as d", "s.department_id", "d.department_id")
+        .where("s.specialty_id", specialtyId)
+        .orderBy("d.department_id", "asc");
+
+      // Kiểm tra kết quả và trả về
+      if (departments.length > 0) {
+        return {
+          status: true,
+          message: "Departments retrieved successfully",
+          data: departments,
+        };
+      } else {
+        return {
+          status: false,
+          message: "No departments found for this specialty",
+        };
+      }
+    } catch (error) {
+      console.error(
+        "Error occurred while getting departments by specialty:",
+        error
+      );
+      return {
+        status: false,
+        message: "Error retrieving departments by specialty",
         error: error.message,
       };
     }

@@ -119,6 +119,26 @@ const handleDepartmentController = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  //------------------- GET DEPARTMENTS BY SPECIALTY --------------------
+  async getDepartmentsBySpecialty(req, res, next) {
+    try {
+      const specialtyId = req.params.specialtyId;
+      const result = await handleDepartmentService.getDepartmentsBySpecialty(
+        specialtyId
+      );
+      if (result.status === true) {
+        res.json({
+          message: result.message,
+          data: result.data,
+        });
+      } else {
+        res.status(404).json({ message: result.message });
+      }
+    } catch (error) {
+      next(new ApiError(500, "Failed to retrieve departments by specialty."));
+    }
+  },
 };
 
 module.exports = handleDepartmentController;
