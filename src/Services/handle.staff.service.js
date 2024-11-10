@@ -96,7 +96,7 @@ const handleStaffService = {
         .first();
 
       const staff_specialty = await knex("STAFF_SPECIALTY as sp")
-        .select("sp.staff_specialty_id", "spe.specialty_name")
+        .select("sp.specialty_id", "spe.specialty_name")
         .join("SPECIALTIES as spe", "spe.specialty_id", "sp.specialty_id")
         .where("sp.staff_id", staffId);
 
@@ -266,6 +266,68 @@ const handleStaffService = {
     }
   },
 
+  // Thông tin ca làm việc của nhân viên
+  async getInformationShift(staff_id) {
+    try {
+      // Get information shifts for the staff
+      const shiftStaffList = await knex("STAFF_SHIFTS as ss")
+        .select(
+          "ss.shift_date",
+          knex.raw("TRIM(ss.shift_id) as shift_id"),
+          "sh.shift_name",
+          "sh.start_time",
+          "sh.end_time",
+          "dep.department_id",
+          "dep.department_name",
+          "spe.specialty_id",
+          "spe.specialty_name",
+          "ss.created_at",
+          "ss.updated_at"
+        )
+        .join("STAFF_DETAILS as sd", "sd.staff_id", "ss.staff_id")
+        .join("SHIFTS as sh", "sh.shift_id", "ss.shift_id")
+        .join("DEPARTMENTS as dep", "dep.department_id", "ss.department_id")
+        .join("STAFF_ACCOUNTS as sc", "sc.staff_id", "ss.staff_id")
+        .join("SPECIALTIES as spe", "spe.specialty_id", "ss.specialty_id")
+        .join("ROLES as rol", "rol.role_id", "sc.role_id")
+        .where("ss.staff_id", staff_id)
+        .orderBy("ss.shift_date", "asc");
+
+      // Kiểm tra nếu không có ca làm việc nào
+      if (!shiftStaffList || shiftStaffList.length === 0) {
+        console.log({
+          status: false,
+          message: "shift list is empty",
+          shiftStaffList: shiftStaffList,
+        });
+        return {
+          status: false,
+          message: "Shift list is empty",
+          shiftStaffList: [],
+        };
+      } else {
+        console.log({
+          status: true,
+          message: "List shift of staff",
+          shiftStaffList: shiftStaffList,
+        });
+        return {
+          status: true,
+          message: "List shift of staff",
+          shiftStaffList: shiftStaffList,
+        };
+      }
+    } catch (error) {
+      console.error("Error during get list shifts:", error.message);
+      // In ra câu lệnh SQL đã thực thi khi có lỗi
+      console.log(
+        "Shift Staff List Query:",
+        knex("STAFF_SHIFTS as ss").toSQL().toNative()
+      );
+      throw error;
+    }
+  },
+
   // ---------------------------THÊM CHUYÊN KHOA CHO NHÂN VIÊN---------------------------
   async addSpecialtiesForStaff(staffId, specialtyIds) {
     try {
@@ -302,22 +364,35 @@ const handleStaffService = {
   async addShiftsForStaff(staffId, shifts) {
     try {
       // Kiểm tra nếu shifts là một mảng
-      if (!Array.isArray(shifts)) {
-        throw new Error("Shifts phải là một mảng chứa các ca làm việc.");
+      if (!Array.isArray(shifts) || shifts.length === 0) {
+        throw new Error("Shifts phải là một mảng chứa các ca làm việc hợp lệ.");
       }
 
-      // Chuẩn bị dữ liệu để chèn vào bảng staff_shifts
-      const shiftsToAdd = shifts.map((shift) => ({
-        staff_id: staffId,
-        shift_id: shift.shift_id,
-        shift_date: shift.shift_date,
-        shift_end_date: shift.shift_end_date,
-        department_id: shift.department_id,
-        specialty_id: shift.specialty_id,
-      }));
+      // Kiểm tra từng đối tượng trong shifts có đủ dữ liệu cần thiết
+      const shiftsToAdd = shifts.map((shift) => {
+        if (
+          !shift.shift_id ||
+          !shift.shift_date ||
+          !shift.shift_end_date ||
+          !shift.department_id ||
+          !shift.specialty_id
+        ) {
+          throw new Error("Thiếu thông tin cần thiết trong ca làm việc.");
+        }
+        return {
+          staff_id: staffId,
+          shift_id: shift.shift_id,
+          shift_date: shift.shift_date,
+          shift_end_date: shift.shift_end_date,
+          department_id: shift.department_id,
+          specialty_id: shift.specialty_id,
+        };
+      });
 
-      // Chèn dữ liệu vào bảng staff_shifts
-      await knex("staff_shifts").insert(shiftsToAdd);
+      // Sử dụng giao dịch để đảm bảo tính toàn vẹn của dữ liệu
+      await knex.transaction(async (trx) => {
+        await trx("STAFF_SHIFTS").insert(shiftsToAdd);
+      });
 
       console.log(
         `Đã thêm các ca làm việc cho nhân viên ${staffId} thành công!`

@@ -108,6 +108,26 @@ const handleStaffController = {
     }
   },
 
+  // ------------------------- LẤY THÔNG TIN CA LÀM VIỆC CỦA NHÂN VIÊN ------------------------
+  async getInformationShift(req, res, next) {
+    try {
+      const staffId = req.params.id; // Lấy staffId từ params
+      const result = await handleStaffService.getInformationShift(staffId); // Gọi service lấy thông tin ca làm việc
+
+      if (result.status === true) {
+        return res.status(200).json({
+          message: result.message,
+          shiftStaffList: result.shiftStaffList,
+        });
+      } else {
+        return next(new ApiError(404, result.message)); // Nếu không có ca làm việc
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin ca làm việc cho nhân viên:", error);
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
+
   // ---------------------------THÊM CHUYÊN KHOA CHO NHÂN VIÊN---------------------------
   async addSpecialtiesForStaff(req, res, next) {
     try {
@@ -128,6 +148,38 @@ const handleStaffController = {
       }
     } catch (error) {
       console.log(error);
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
+
+  // ---------------------------THÊM CA LÀM VIỆC CHO NHÂN VIÊN---------------------------
+  async addShiftsForStaff(req, res, next) {
+    try {
+      const staffId = req.params.id; // Lấy staffId từ params
+      const { shifts } = req.body; // Lấy danh sách ca làm việc từ body
+
+      // Kiểm tra xem shifts có phải là mảng hay không
+      if (!Array.isArray(shifts) || shifts.length === 0) {
+        return next(
+          new ApiError(400, "Shifts phải là một mảng và không được rỗng.")
+        );
+      }
+
+      // Gọi service để thêm các ca làm việc cho nhân viên
+      const result = await handleStaffService.addShiftsForStaff(
+        staffId,
+        shifts
+      );
+
+      if (result.success === true) {
+        return res.status(200).json({
+          message: result.message,
+        });
+      } else {
+        return next(new ApiError(400, result.message));
+      }
+    } catch (error) {
+      console.log("Lỗi khi thêm ca làm việc cho nhân viên:", error);
       return next(new ApiError(500, "Internal Server Error"));
     }
   },

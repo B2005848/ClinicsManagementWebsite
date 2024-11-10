@@ -23,9 +23,15 @@ router.get(
   handleStaffController.getDoctorShifts
 );
 
+// ===================== GET STAFF SHIFT INFORMATION =====================
+router.get("/getStaffShifts/:id", handleStaffController.getInformationShift);
+
 // ==========ADD SPECIALTIES FOR STAFF==========
 router.post(
   "/addSpecialtiesForStaff/:id",
   handleStaffController.addSpecialtiesForStaff
 );
+
+//============ADD SHIFTS FOF STAFF==============
+router.post("/:id/shifts", handleStaffController.addShiftsForStaff);
 module.exports = router;
