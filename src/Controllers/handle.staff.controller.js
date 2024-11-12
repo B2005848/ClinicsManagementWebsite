@@ -233,6 +233,32 @@ const handleStaffController = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  // ---------------------------DELETE STAFF---------------------------
+  async deleteStaff(req, res, next) {
+    try {
+      const staffId = req.params.id;
+
+      // Gọi hàm xóa nhân viên từ service
+      const result = await handleStaffService.deleteStaff(staffId);
+
+      // Nếu xóa thành công, trả về phản hồi 200
+      if (result.success) {
+        return res.status(200).json({ message: result.message });
+      }
+
+      // Nếu không thành công, trả về lỗi 400 hoặc lỗi không tìm thấy
+      return next(
+        new ApiError(
+          result.message === "Staff not found" ? 404 : 400,
+          result.message
+        )
+      );
+    } catch (error) {
+      console.error("Error in handleStaffController - deleteStaff:", error);
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
 };
 
 module.exports = handleStaffController;

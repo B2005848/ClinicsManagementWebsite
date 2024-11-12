@@ -466,7 +466,7 @@ const handleStaffService = {
         };
       }
 
-      if (staff.status !== 0) {
+      if (staff.status !== "0") {
         console.log("Only staff with status 0 can be deleted");
         return {
           success: false,
@@ -475,10 +475,10 @@ const handleStaffService = {
       }
 
       // Tiến hành xóa nhân viên
-      await knex("STAFF_ACCOUNTS").where("staff_id", staffId).del();
       await knex("STAFF_DETAILS").where("staff_id", staffId).del();
       await knex("STAFF_SPECIALTY").where("staff_id", staffId).del();
       await knex("STAFF_SHIFTS").where("staff_id", staffId).del();
+      await knex("STAFF_ACCOUNTS").where("staff_id", staffId).del();
 
       console.log(`Staff with ID ${staffId} deleted successfully`);
       return {

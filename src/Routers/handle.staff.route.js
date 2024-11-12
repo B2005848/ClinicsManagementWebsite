@@ -37,4 +37,7 @@ router.post("/:id/shifts", handleStaffController.addShiftsForStaff);
 
 // ========== CẬP NHẬT THÔNG TIN NHÂN VIÊN ==========
 router.patch("/:id", handleStaffController.updateStaffInfo);
+
+//================DELETE STAFF BY ID===============
+router.delete("/:id", handleStaffController.deleteStaff);
 module.exports = router;
