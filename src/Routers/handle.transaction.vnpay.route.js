@@ -1,5 +1,5 @@
 const express = require("express");
-const paymentController = require("../controllers/handle.transaction.vnpay.controller");
+const paymentController = require("../Controllers/handle.transaction.vnpay.controller");
 const router = express.Router();
 
 // Định nghĩa các route cho các phương thức

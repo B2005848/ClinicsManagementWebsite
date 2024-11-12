@@ -58,7 +58,7 @@ const paymentVNPayController = {
   async handleVNPayReturnUrl(req, res, next) {
     try {
       const query = req.query;
-
+      console.log(query);
       // Gọi service để xử lý kết quả trả về từ VNPay
       const result = await handleVNPAYServices.handleVNPayReturnUrl(query);
 

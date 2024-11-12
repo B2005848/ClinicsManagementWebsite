@@ -447,6 +447,53 @@ const handleStaffService = {
       };
     }
   },
+
+  // ---------------------------DELETE STAFF---------------------------
+  async deleteStaff(staffId) {
+    try {
+      // Kiểm tra trạng thái của nhân viên
+      const staff = await knex("STAFF_ACCOUNTS")
+        .select("status")
+        .where("staff_id", staffId)
+        .first();
+
+      // Nếu nhân viên không tồn tại hoặc status khác 0, trả về thông báo lỗi
+      if (!staff) {
+        console.log("Staff not found");
+        return {
+          success: false,
+          message: "Staff not found",
+        };
+      }
+
+      if (staff.status !== 0) {
+        console.log("Only staff with status 0 can be deleted");
+        return {
+          success: false,
+          message: "Only staff with status 0 can be deleted",
+        };
+      }
+
+      // Tiến hành xóa nhân viên
+      await knex("STAFF_ACCOUNTS").where("staff_id", staffId).del();
+      await knex("STAFF_DETAILS").where("staff_id", staffId).del();
+      await knex("STAFF_SPECIALTY").where("staff_id", staffId).del();
+      await knex("STAFF_SHIFTS").where("staff_id", staffId).del();
+
+      console.log(`Staff with ID ${staffId} deleted successfully`);
+      return {
+        success: true,
+        message: "Staff deleted successfully",
+      };
+    } catch (error) {
+      console.error("Error during deleting staff:", error);
+      return {
+        success: false,
+        message: "Error during deleting staff",
+        error: error.message,
+      };
+    }
+  },
 };
 
 module.exports = handleStaffService;
