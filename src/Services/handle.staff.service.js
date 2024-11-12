@@ -412,6 +412,41 @@ const handleStaffService = {
       };
     }
   },
+
+  //Chỉnh sửa thông tin cơ bản nhân viên
+  // -------------------------UPDATE BASIC STAFF INFORMATION-------------------------
+  async updateStaffInfo(staffId, updatedInfoBasic, updatedInfoAccount) {
+    try {
+      // Update basic information in the STAFF_DETAILS table
+      if (updatedInfoBasic) {
+        await knex("STAFF_DETAILS")
+          .where("staff_id", staffId)
+          .update(updatedInfoBasic);
+      }
+
+      // Optionally, update information in STAFF_ACCOUNTS table if needed
+      if (updatedInfoAccount.status) {
+        await knex("STAFF_ACCOUNTS")
+          .where("staff_id", staffId)
+          .update(updatedInfoAccount);
+      }
+
+      console.log(
+        `Staff information updated successfully for staff ID: ${staffId}`
+      );
+      return {
+        success: true,
+        message: "Staff information updated successfully.",
+      };
+    } catch (error) {
+      console.error("Error during updating staff information:", error);
+      return {
+        success: false,
+        message: "Error during updating staff information.",
+        error: error.message,
+      };
+    }
+  },
 };
 
 module.exports = handleStaffService;

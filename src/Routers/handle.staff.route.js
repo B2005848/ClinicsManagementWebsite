@@ -34,4 +34,7 @@ router.post(
 
 //============ADD SHIFTS FOF STAFF==============
 router.post("/:id/shifts", handleStaffController.addShiftsForStaff);
+
+// ========== CẬP NHẬT THÔNG TIN NHÂN VIÊN ==========
+router.patch("/:id", handleStaffController.updateStaffInfo);
 module.exports = router;

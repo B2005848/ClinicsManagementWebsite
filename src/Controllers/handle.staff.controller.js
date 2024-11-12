@@ -183,6 +183,56 @@ const handleStaffController = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  // -------------------------UPDATE STAFF INFORMATION-------------------------
+  async updateStaffInfo(req, res, next) {
+    try {
+      const staff_id = req.params.id;
+      const {
+        first_name,
+        last_name,
+        citizen_id,
+        birthday,
+        gender,
+        email,
+        address_contact,
+        nation,
+        religion,
+        nationality,
+        status,
+      } = req.body;
+
+      const infoBasicData = {
+        first_name,
+        last_name,
+        citizen_id,
+        birthday,
+        gender,
+        email,
+        address_contact,
+        nation,
+        religion,
+        nationality,
+      };
+
+      const accountInfo = { status };
+
+      const result = await handleStaffService.updateStaffInfo(
+        staff_id,
+        infoBasicData,
+        accountInfo
+      );
+
+      if (result.success) {
+        return res.status(200).json({ message: result.message });
+      } else {
+        return next(new ApiError(400, result.message));
+      }
+    } catch (error) {
+      console.log("Error updating staff information:", error);
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
 };
 
 module.exports = handleStaffController;
