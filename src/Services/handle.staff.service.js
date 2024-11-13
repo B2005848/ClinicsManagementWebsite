@@ -363,7 +363,6 @@ const handleStaffService = {
   },
 
   // Thêm ca làm việc cho nhân viên
-  // Thêm ca làm việc cho nhân viên
   async addShiftsForStaff(staffId, shifts) {
     try {
       // Kiểm tra nếu shifts là một mảng
@@ -435,7 +434,6 @@ const handleStaffService = {
     }
   },
 
-  //Chỉnh sửa thông tin cơ bản nhân viên
   // -------------------------UPDATE BASIC STAFF INFORMATION-------------------------
   async updateStaffInfo(staffId, updatedInfoBasic, updatedInfoAccount) {
     try {
@@ -452,6 +450,97 @@ const handleStaffService = {
           .where("staff_id", staffId)
           .update(updatedInfoAccount);
       }
+
+      console.log(
+        `Staff information updated successfully for staff ID: ${staffId}`
+      );
+      return {
+        success: true,
+        message: "Staff information updated successfully.",
+      };
+    } catch (error) {
+      console.error("Error during updating staff information:", error);
+      return {
+        success: false,
+        message: "Error during updating staff information.",
+        error: error.message,
+      };
+    }
+  },
+
+  // -------------------------UPDATE WORK STAFF INFORMATION-------------------------
+
+  async updateStaffInfoWork(staffId, workContract, updatedInfoSpecialty) {
+    try {
+      await knex.transaction(async (trx) => {
+        // Cập nhật workContract trong bảng STAFF_DETAILS
+        if (workContract) {
+          console.log("Updating work_contract in STAFF_DETAILS...");
+
+          const updateResult = await trx("STAFF_DETAILS")
+            .where("staff_id", staffId)
+            .update({ work_contract: workContract });
+
+          // Kiểm tra nếu cập nhật không thành công
+          if (updateResult === 0) {
+            console.log("No rows updated in STAFF_DETAILS.");
+          } else {
+            console.log("work_contract updated successfully in STAFF_DETAILS.");
+          }
+        } else {
+          console.log("workContract is null or undefined, skipping update.");
+        }
+
+        // Tiếp tục với cập nhật ngày kết thúc ca làm việc nếu có
+        if (workContract) {
+          const contractYears = parseInt(workContract, 10);
+          const currentShifts = await trx("STAFF_SHIFTS")
+            .select("shift_id", "shift_end_date")
+            .where("staff_id", staffId);
+
+          const updatedShifts = currentShifts.map((shift) => {
+            const newEndDate = new Date(shift.shift_end_date);
+            newEndDate.setFullYear(newEndDate.getFullYear() + contractYears);
+            return {
+              ...shift,
+              shift_end_date: newEndDate,
+            };
+          });
+
+          for (const shift of updatedShifts) {
+            await trx("STAFF_SHIFTS")
+              .where("staff_id", staffId)
+              .andWhere("shift_id", shift.shift_id)
+              .update({ shift_end_date: shift.shift_end_date });
+          }
+        }
+
+        // Xác minh và cập nhật specialty nếu có
+        if (updatedInfoSpecialty && Array.isArray(updatedInfoSpecialty)) {
+          await trx("STAFF_SPECIALTY").where("staff_id", staffId).del();
+
+          const validSpecialties = await trx("SPECIALTIES")
+            .whereIn("specialty_id", updatedInfoSpecialty)
+            .select("specialty_id");
+
+          const validSpecialtyIds = validSpecialties.map(
+            (spec) => spec.specialty_id
+          );
+
+          const newSpecialties = validSpecialtyIds.map((specialtyId) => ({
+            staff_id: staffId,
+            specialty_id: specialtyId,
+            created_at: new Date(),
+            updated_at: new Date(),
+          }));
+
+          if (newSpecialties.length > 0) {
+            await trx("STAFF_SPECIALTY").insert(newSpecialties);
+          } else {
+            console.log("No valid specialty_ids found to insert.");
+          }
+        }
+      });
 
       console.log(
         `Staff information updated successfully for staff ID: ${staffId}`

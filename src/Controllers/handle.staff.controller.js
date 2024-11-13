@@ -234,6 +234,38 @@ const handleStaffController = {
     }
   },
 
+  // -------------------------UPDATE STAFF WORK CONTACT AND SPECIALTIES-------------------------
+  async updateStaffInfoWork(req, res, next) {
+    try {
+      const staffId = req.params.id;
+      const { workContract, specialtyIds } = req.body;
+
+      // Chuẩn bị dữ liệu để cập nhật
+      const updatedInfoSpecialty =
+        Array.isArray(specialtyIds) && specialtyIds.length > 0
+          ? specialtyIds
+          : null;
+
+      // Gọi service để cập nhật thông tin workContact và specialty
+      const result = await handleStaffService.updateStaffInfoWork(
+        staffId,
+        workContract,
+        updatedInfoSpecialty
+      );
+
+      if (result.success) {
+        return res.status(200).json({ message: result.message });
+      } else {
+        return next(new ApiError(400, result.message));
+      }
+    } catch (error) {
+      console.error(
+        "Error updating staff work contact and specialties:",
+        error
+      );
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
   // ---------------------------DELETE STAFF---------------------------
   async deleteStaff(req, res, next) {
     try {
