@@ -363,6 +363,7 @@ const handleStaffService = {
   },
 
   // Thêm ca làm việc cho nhân viên
+  // Thêm ca làm việc cho nhân viên
   async addShiftsForStaff(staffId, shifts) {
     try {
       // Kiểm tra nếu shifts là một mảng
@@ -393,7 +394,28 @@ const handleStaffService = {
 
       // Sử dụng giao dịch để đảm bảo tính toàn vẹn của dữ liệu
       await knex.transaction(async (trx) => {
-        await trx("STAFF_SHIFTS").insert(shiftsToAdd);
+        for (const shift of shiftsToAdd) {
+          // Kiểm tra xem có xung đột không
+          const conflict = await trx("STAFF_SHIFTS")
+            .where("staff_id", staffId)
+            .andWhere("shift_id", shift.shift_id)
+            .andWhere((builder) => {
+              builder
+                .where("shift_date", "<=", shift.shift_end_date)
+                .andWhere("shift_end_date", ">=", shift.shift_date);
+            })
+
+            .first();
+
+          if (conflict) {
+            throw new Error(
+              `Ca làm việc trùng lặp với ca đã tồn tại: ${shift.shift_id} từ ${shift.shift_date} đến ${shift.shift_end_date}`
+            );
+          }
+
+          // Thêm ca làm việc nếu không có xung đột
+          await trx("STAFF_SHIFTS").insert(shift);
+        }
       });
 
       console.log(
