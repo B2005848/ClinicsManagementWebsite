@@ -1,6 +1,74 @@
 const { knex } = require("../../db.config");
 require("dotenv").config();
 const handleShiftService = {
+  // ----------------------------GET SHIFT BY ID------------------------------
+  async getShiftById(shift_id) {
+    try {
+      // Truy vấn bảng SHIFTS để lấy thông tin ca làm việc theo shift_id
+      const shift = await knex("SHIFTS")
+        .select(
+          knex.raw("TRIM(shift_id) as shift_id"),
+          "shift_name",
+          "start_time",
+          "end_time",
+          "created_at",
+          "updated_at"
+        )
+        .where("shift_id", shift_id)
+        .first(); // Dùng first() để chỉ lấy một bản ghi
+
+      if (!shift) {
+        return {
+          status: false,
+          message: "Shift not found",
+        };
+      }
+
+      console.log("Shift found:", shift);
+      return {
+        status: true,
+        message: "Shift found",
+        data: shift,
+      };
+    } catch (error) {
+      console.error("Error during fetching shift data:", error);
+      return {
+        status: false,
+        message: "Error during fetching shift data",
+        error: error.message,
+      };
+    }
+  },
+
+  // ----------------------------CREATE NEW SHIFT------------------------------
+  async createShift(newShiftData) {
+    try {
+      // Insert new shift data into SHIFTS table
+      const [newShift] = await knex("SHIFTS")
+        .insert({
+          shift_id: newShiftData.shift_id,
+          shift_name: newShiftData.shift_name,
+          start_time: newShiftData.start_time,
+          end_time: newShiftData.end_time,
+        })
+        .returning("*"); // Use returning to get the newly inserted row
+
+      console.log("New shift created successfully:", newShift);
+      return {
+        status: true,
+        message: "New shift created successfully",
+        data: newShift,
+      };
+    } catch (error) {
+      console.error("Error during creating new shift:", error);
+      return {
+        status: false,
+        message: "Error during creating new shift",
+        error: error.message,
+      };
+    }
+  },
+
   // ----------------------------GET DATA SHIFT------------------------------
   async getShiftList(page) {
     try {
@@ -165,6 +233,54 @@ const handleShiftService = {
       console.log("Shift Staff List Query:", shiftStaffList.toSQL().toNative());
 
       throw error;
+    }
+  },
+
+  // ----------------------------UPDATE EXISTING SHIFT------------------------------
+  async updateShift(shift_id, updatedShiftData) {
+    try {
+      // Check if shift exists
+      const existingShift = await knex("SHIFTS")
+        .select("*")
+        .where("shift_id", shift_id)
+        .first();
+
+      if (!existingShift) {
+        return {
+          status: false,
+          message: "Shift not found",
+        };
+      }
+
+      // Update shift data without using RETURNING
+      const updateResult = await knex("SHIFTS")
+        .where("shift_id", shift_id)
+        .update({
+          shift_name: updatedShiftData.shift_name || existingShift.shift_name,
+          start_time: updatedShiftData.start_time || existingShift.start_time,
+          end_time: updatedShiftData.end_time || existingShift.end_time,
+        });
+
+      // Check if any rows were updated
+      if (updateResult === 0) {
+        return {
+          status: false,
+          message: "Failed to update shift (no rows affected)",
+        };
+      }
+
+      console.log("Shift updated successfully");
+      return {
+        status: true,
+        message: "Shift updated successfully",
+      };
+    } catch (error) {
+      console.error("Error during updating shift:", error);
+      return {
+        status: false,
+        message: "Error during updating shift",
+        error: error.message,
+      };
     }
   },
 };

@@ -136,11 +136,16 @@ const handleStaffService = {
         )
         .join("STAFF_DETAILS as sd", "sd.staff_id", "sa.staff_id")
         .join("ROLES as r", "r.role_id", "sa.role_id")
-        .where("sa.staff_id", "like", `%${query}%`)
-        .orWhere("sd.first_name", "like", `%${query}%`)
-        .orWhere("sd.last_name", "like", `%${query}%`)
-        .orWhere("sd.citizen_id", "like", `%${query}%`)
-        .orWhere("sd.email", "like", `%${query}%`)
+        .where(function () {
+          this.where("sa.staff_id", "like", `%${query}%`)
+            .orWhere("sd.first_name", "like", `%${query}%`)
+            .orWhere("sd.last_name", "like", `%${query}%`)
+            .orWhere("sd.citizen_id", "like", `%${query}%`)
+            .orWhere("sd.email", "like", `%${query}%`)
+            .orWhereRaw("CONCAT(sd.first_name, ' ', sd.last_name) LIKE ?", [
+              `%${query}%`,
+            ]); // Tìm theo tên đầy đủ
+        })
         .orderBy("sd.staff_id", "asc");
       if (staffList.length > 0) {
         console.log("Search staff success");
@@ -476,10 +481,20 @@ const handleStaffService = {
         // Cập nhật workContract trong bảng STAFF_DETAILS
         if (workContract) {
           console.log("Updating work_contract in STAFF_DETAILS...");
+          const [currenWorkContract] = await knex("STAFF_DETAILS")
+            .select("work_contract")
+            .where("staff_id", staffId);
+
+          console.log("Current Work_contract:", currenWorkContract);
+
+          const totalWorkContract = parseInt(
+            parseInt(workContract) + parseInt(currenWorkContract.work_contract)
+          );
+          console.log("total Work_contract:", totalWorkContract);
 
           const updateResult = await trx("STAFF_DETAILS")
             .where("staff_id", staffId)
-            .update({ work_contract: workContract });
+            .update({ work_contract: totalWorkContract });
 
           // Kiểm tra nếu cập nhật không thành công
           if (updateResult === 0) {
@@ -491,7 +506,7 @@ const handleStaffService = {
           console.log("workContract is null or undefined, skipping update.");
         }
 
-        // Tiếp tục với cập nhật ngày kết thúc ca làm việc nếu có
+        // Tiếp tục với cập nhật ngày kết thúc ca làm việc nếu có gia hạn hợp đồng
         if (workContract) {
           const contractYears = parseInt(workContract, 10);
           const currentShifts = await trx("STAFF_SHIFTS")
@@ -517,8 +532,6 @@ const handleStaffService = {
 
         // Xác minh và cập nhật specialty nếu có
         if (updatedInfoSpecialty && Array.isArray(updatedInfoSpecialty)) {
-          await trx("STAFF_SPECIALTY").where("staff_id", staffId).del();
-
           const validSpecialties = await trx("SPECIALTIES")
             .whereIn("specialty_id", updatedInfoSpecialty)
             .select("specialty_id");

@@ -120,10 +120,15 @@ const handlePatientService = {
           "pd.birthday"
         )
         .join("PATIENT_DETAILS as pd", "pa.patient_id", "pd.patient_id")
-        .where("pa.patient_id", "like", `%${query}%`)
-        .orWhere("pd.first_name", "like", `%${query}%`)
-        .orWhere("pd.last_name", "like", `%${query}%`)
-        .orWhere("pd.citizen_id", "like", `%${query}%`)
+        .where(function () {
+          this.where("pa.patient_id", "like", `%${query}%`)
+            .orWhere("pd.first_name", "like", `%${query}%`)
+            .orWhere("pd.last_name", "like", `%${query}%`)
+            .orWhere("pd.citizen_id", "like", `%${query}%`)
+            .orWhereRaw("CONCAT(pd.first_name, ' ', pd.last_name) LIKE ?", [
+              `%${query}%`,
+            ]); // Tìm theo tên đầy đủ
+        })
         .orderBy("pa.patient_id", "asc");
       if (patients.length > 0) {
         return {
