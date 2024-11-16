@@ -196,9 +196,11 @@ const handleDepartment = {
       // Search departments by id, description, name
       const deparmentList = await knex("DEPARTMENTS as dep")
         .select("dep.*")
-        .where("dep.department_id", "like", `%${query}%`)
-        .orWhere("dep.department_name", "like", `%${query}%`)
-        .orWhere("dep.description", "like", `%${query}%`)
+        .where(function () {
+          this.where("dep.department_id", "like", `%${query}%`)
+            .orWhere("dep.department_name", "like", `%${query}%`)
+            .orWhere("dep.description", "like", `%${query}%`);
+        })
         .orderBy("dep.department_id", "asc");
       if (deparmentList.length > 0) {
         console.log("Search department success");
@@ -257,6 +259,142 @@ const handleDepartment = {
         message: "Error retrieving departments by specialty",
         error: error.message,
       };
+    }
+  },
+
+  //---------------------------------------------- CHECK IF DEPARTMENT NAME EXISTS -----------------------------------------
+  async checkDepartmentNameExists(departmentName) {
+    try {
+      // Kiểm tra xem tên phòng đã tồn tại chưa
+      const existingDepartment = await knex("DEPARTMENTS")
+        .where("department_name", departmentName)
+        .first();
+
+      if (existingDepartment) {
+        return {
+          status: true,
+          message: "Department name already exists", // Trả về thông báo tên phòng đã tồn tại
+        };
+      } else {
+        return {
+          status: false,
+          message: "Department name is available", // Tên phòng chưa tồn tại
+        };
+      }
+    } catch (error) {
+      console.error("Error occurred while checking department name:", error);
+      throw error;
+    }
+  },
+
+  //---------------------------------------------- CHECK IF DEPARTMENT ID EXISTS -----------------------------------------
+  async checkDepartmentIdExists(departmentId) {
+    try {
+      // Kiểm tra xem ID phòng đã tồn tại chưa
+      const existingDepartment = await knex("DEPARTMENTS")
+        .where("department_id", departmentId)
+        .first();
+
+      if (existingDepartment) {
+        return {
+          status: true,
+          message: "department_id already exists", // Trả về thông báo ID phòng đã tồn tại
+        };
+      } else {
+        return {
+          status: false,
+          message: "department_id is available", // ID phòng chưa tồn tại
+        };
+      }
+    } catch (error) {
+      console.error("Error occurred while checking department ID:", error);
+      throw error;
+    }
+  },
+
+  //Lấy danh sách nhân viên theo phòng làm việc
+  async getListStaffByDepId(department_id, page) {
+    try {
+      const itemsPerPage = 10;
+
+      const offset = (page - 1) * itemsPerPage;
+
+      const totalShitfStaff = await knex("STAFF_SHIFTS")
+        .count("* as totalCount")
+        .where("STAFF_SHIFTS.department_id", department_id)
+        .first();
+
+      const totalShitfStaffCount = totalShitfStaff.totalCount;
+      const totalPages = Math.ceil(totalShitfStaffCount / itemsPerPage);
+      if (page > totalPages) {
+        return {
+          status: false,
+          message: `Page ${page} exceeds total number of pages (${totalPages}). No shifts available.`,
+          totalPages,
+          ShiftStaff: [],
+        };
+      }
+
+      // get Staff list by shift_id and page
+      const listStaffByDep = await knex("STAFF_SHIFTS as ss")
+        .select(
+          "ss.staff_id",
+          "sd.first_name",
+          "sd.last_name",
+          "sd.email",
+          "rol.role_name"
+        )
+        .join("STAFF_DETAILS as sd", "sd.staff_id", "ss.staff_id")
+        .join("STAFF_ACCOUNTS as sc", "sc.staff_id", "ss.staff_id")
+        .join("ROLES as rol", "rol.role_id", "sc.role_id")
+        .where("ss.department_id", department_id)
+        .orderBy("rol.role_name", "asc")
+        .groupBy(
+          "ss.staff_id",
+          "sd.first_name",
+          "sd.last_name",
+          "sd.email",
+          "rol.role_name"
+        )
+        .limit(itemsPerPage)
+        .offset(offset);
+
+      if (listStaffByDep.length === 0) {
+        console.log({
+          status: false,
+          message: "staff list by deparment_id is empty",
+          totalPages,
+          listStaffByDep,
+          itemsPerPage,
+        });
+        return {
+          status: false,
+          message: "staff list by deparment_id is empty",
+          totalPages,
+          listStaffByDep,
+          itemsPerPage,
+        };
+      } else {
+        console.log({
+          status: true,
+          message: "List staff by deparment_id",
+          totalPages,
+          listStaffByDep,
+          itemsPerPage,
+        });
+        return {
+          status: true,
+          message: "List staff by deparment_id",
+          totalPages,
+          listStaffByDep,
+          itemsPerPage,
+        };
+      }
+    } catch (error) {
+      console.error("Error during get list shifts :", error.message);
+      console.log("Department ID:", department_id);
+
+      throw error;
     }
   },
 };

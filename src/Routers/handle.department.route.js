@@ -30,4 +30,19 @@ router.get(
   "/specialty/:specialtyId",
   handleDepartmentController.getDepartmentsBySpecialty
 );
+
+// ========CHECK IF DEPARTMENT NAME EXISTS
+router.post(
+  "/check-name",
+  handleDepartmentController.checkDepartmentNameExists
+);
+
+// ========CHECK IF DEPARTMENT ID EXISTS
+router.post("/check-id", handleDepartmentController.checkDepartmentIdExists);
+
+// GET LIST STAFF BY DEP_ID
+router.get(
+  "/liststaff/:department_id",
+  handleDepartmentController.getListStaffByDep
+);
 module.exports = router;

@@ -41,12 +41,12 @@ const handleDepartmentController = {
         deparmentData
       );
       if (data.status === true) {
-        res.json({
+        res.status(200).json({
           message: data.message,
           departmentData: data.departmentData,
         });
       } else {
-        res.json({ message: data.message });
+        res.status(404).json({ message: data.message });
       }
     } catch (error) {
       next(new ApiError(400, "get all patient fail!"));
@@ -137,6 +137,78 @@ const handleDepartmentController = {
       }
     } catch (error) {
       next(new ApiError(500, "Failed to retrieve departments by specialty."));
+    }
+  },
+
+  //------------------------------------------------------CHECK IF DEPARTMENT NAME EXISTS--------------------------------
+  async checkDepartmentNameExists(req, res, next) {
+    try {
+      const { department_name } = req.body;
+
+      // Kiểm tra xem tên phòng ban đã tồn tại trong cơ sở dữ liệu chưa
+      const departmentExists =
+        await handleDepartmentService.checkDepartmentNameExists(
+          department_name
+        );
+
+      if (departmentExists.status === true) {
+        return res.status(400).json({
+          message: `Tên phòng ban "${department_name}" đã tồn tại, vui lòng chọn tên khác.`,
+        });
+      } else {
+        return res.status(200).json({
+          message: `Tên phòng ban "${department_name}" có thể sử dụng.`,
+        });
+      }
+    } catch (error) {
+      next(new ApiError(500, "Kiểm tra tên phòng ban thất bại"));
+    }
+  },
+
+  //------------------------------------------------------CHECK IF DEPARTMENT ID EXISTS--------------------------------
+  async checkDepartmentIdExists(req, res, next) {
+    try {
+      const { department_id } = req.body;
+
+      // Kiểm tra xem ID phòng ban đã tồn tại trong cơ sở dữ liệu chưa
+      const departmentExists =
+        await handleDepartmentService.checkDepartmentIdExists(department_id);
+
+      if (departmentExists.status === true) {
+        return res.status(400).json({
+          message: `ID phòng ban "${department_id}" đã tồn tại, vui lòng chọn ID khác.`,
+        });
+      } else {
+        return res.status(200).json({
+          message: `ID phòng ban "${department_id}" có thể sử dụng.`,
+        });
+      }
+    } catch (error) {
+      next(new ApiError(500, "Kiểm tra tên phòng ban thất bại"));
+    }
+  },
+
+  //lấy danh sách nhân viên theo department_id
+  async getListStaffByDep(req, res, next) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const department_id = req.params.department_id;
+      const { message, totalPages, listStaffByDep, itemsPerPage } =
+        await handleDepartmentService.getListStaffByDepId(department_id, page);
+      if (listStaffByDep === 0) {
+        return res.status(204).json({
+          message: `No staff join in this department: ${department_id}`,
+          totalPages,
+        });
+      }
+      res
+        .status(200)
+        .json({ message, totalPages, listStaffByDep, itemsPerPage });
+    } catch (error) {
+      console.log(error);
+      return next(
+        new ApiError(400, "Failed to get list staff by department ID!")
+      );
     }
   },
 };
