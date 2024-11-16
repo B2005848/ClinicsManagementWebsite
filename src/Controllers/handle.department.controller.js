@@ -188,6 +188,31 @@ const handleDepartmentController = {
     }
   },
 
+  // Lấy thông tin chi tiết phòng khám
+  async getDepartmentDetail(req, res, next) {
+    try {
+      const department_id = req.params.id;
+
+      // Kiểm tra xem ID phòng ban đã tồn tại trong cơ sở dữ liệu chưa
+      const result = await handleDepartmentService.getDepartmentDetail(
+        department_id
+      );
+
+      if (result.status === true) {
+        return res.status(200).json({
+          message: result.message,
+          data: result.data,
+        });
+      } else {
+        return res.status(400).json({
+          message: result.message,
+        });
+      }
+    } catch (error) {
+      next(new ApiError(500, "Lấy dữ liệu chi tiết của phòng thất bại"));
+    }
+  },
+
   //lấy danh sách nhân viên theo department_id
   async getListStaffByDep(req, res, next) {
     try {

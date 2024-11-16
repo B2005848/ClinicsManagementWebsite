@@ -312,6 +312,32 @@ const handleDepartment = {
     }
   },
 
+  // Lấy thông tin chi tiết phòng khám
+  async getDepartmentDetail(departmentId) {
+    try {
+      // Kiểm tra xem ID phòng đã tồn tại chưa
+      const department = await knex("DEPARTMENTS")
+        .where("department_id", departmentId)
+        .first();
+
+      if (department) {
+        return {
+          status: true,
+          message: "Get detail department success",
+          data: department,
+        };
+      } else {
+        return {
+          status: false,
+          message: "Get detail department fails",
+        };
+      }
+    } catch (error) {
+      console.error("Error occurred while get data by department ID:", error);
+      throw error;
+    }
+  },
+
   //Lấy danh sách nhân viên theo phòng làm việc
   async getListStaffByDepId(department_id, page) {
     try {

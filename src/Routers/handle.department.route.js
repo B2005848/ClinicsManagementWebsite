@@ -40,6 +40,9 @@ router.post(
 // ========CHECK IF DEPARTMENT ID EXISTS
 router.post("/check-id", handleDepartmentController.checkDepartmentIdExists);
 
+// ======== GET DATA DETAIL OF DEPARTMENT
+router.get("/:id", handleDepartmentController.getDepartmentDetail);
+
 // GET LIST STAFF BY DEP_ID
 router.get(
   "/liststaff/:department_id",
