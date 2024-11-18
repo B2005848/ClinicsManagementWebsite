@@ -42,6 +42,33 @@ const handleDepartment = {
       throw error;
     }
   },
+
+  //----------------------------------------------GET ALL DEPARTMENT--------------------------------
+  async getAllDepartments() {
+    try {
+      const deparments = await knex("DEPARTMENTS").orderBy(
+        "department_id",
+        "asc"
+      );
+
+      if (deparments.length > 0) {
+        return {
+          status: true,
+          message: "Departments retrieved successfully",
+          listDepartments: deparments,
+        };
+      } else {
+        return {
+          status: false,
+          message: "No deparment available",
+          listDepartments: [],
+        };
+      }
+    } catch (error) {
+      console.error("Error occurred while getting deparments:", error);
+      throw error;
+    }
+  },
   //----------------------------------------------GET LIST DEPARTMENTS FOR PATIENTS--------------------------------
   async getDepartmentsForPatient(page) {
     try {
@@ -230,14 +257,11 @@ const handleDepartment = {
   async getDepartmentsBySpecialty(specialtyId) {
     try {
       // Truy vấn để lấy danh sách phòng ban có liên quan đến `specialty_id` từ bảng SERVICES
-      const departments = await knex("SERVICES as s")
-        .distinct("d.department_id", "d.department_name")
-        .join("DEPARTMENTS as d", "s.department_id", "d.department_id")
-        .where("s.specialty_id", specialtyId)
-        .orderBy("d.department_id", "asc");
-
+      const departments = await knex("DEPARTMENTS")
+        .where("specialty_id", specialtyId)
+        .first();
       // Kiểm tra kết quả và trả về
-      if (departments.length > 0) {
+      if (departments) {
         return {
           status: true,
           message: "Departments retrieved successfully",

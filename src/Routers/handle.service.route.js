@@ -11,4 +11,7 @@ router.get(
 //============= lẤY DANH SÁCH DỊCH VỤ-
 router.get("/getlistservices", handleServiceController.getServiceForAdmin);
 
+// TÌM KIẾM DỊCH VỤ
+router.get("/search", handleServiceController.searchServices);
+
 module.exports = router;

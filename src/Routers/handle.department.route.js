@@ -13,6 +13,8 @@ router.get(
   handleDepartmentController.getDepartmentsForAdmin
 );
 
+router.get("/getAllDepartments", handleDepartmentController.getAllDepartments);
+
 //========== CREATE A NEW DEPARTMENT
 router.post("/create", handleDepartmentController.createDepartment);
 

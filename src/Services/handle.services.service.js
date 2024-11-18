@@ -79,6 +79,46 @@ const handleServiceManagement = {
       throw error;
     }
   },
+
+  // TÌm kiếm dịch vụ
+  async searchServices(query) {
+    try {
+      const services = await knex("SERVICES as se")
+        .select("se.*", "dep.department_name", "spe.specialty_name")
+        .join("DEPARTMENTS as dep", "dep.department_id", "se.department_id")
+        .join("SPECIALTIES as spe", "spe.specialty_id", "se.specialty_id")
+        .where(function () {
+          this.where("dep.department_id", "like", `%${query}%`)
+            .orWhere("dep.department_name", "like", `%${query}%`)
+            .orWhere("se.specialty_id", "like", `%${query}%`)
+            .orWhere("se.service_name", "like", `%${query}%`)
+            .orWhere("se.service_name", "like", `%${query}%`)
+            .orWhere("se.service_id", "like", `%${query}%`);
+        })
+        .orderBy("se.service_id", "asc");
+      if (services.length > 0) {
+        console.log("Search service success");
+        return {
+          success: true,
+          message: "List Services",
+          data: services,
+        };
+      } else {
+        console.log("services not found");
+        return {
+          success: false,
+          message: "services not found",
+        };
+      }
+    } catch (error) {
+      console.error("Error during search services:", error);
+      return {
+        status: false,
+        message: "Error during search services",
+        error: error.message,
+      };
+    }
+  },
 };
 
 module.exports = handleServiceManagement;

@@ -27,6 +27,24 @@ const handleDepartmentController = {
     }
   },
 
+  // ---------------GET LIST OF ALL DEPARTMENT----------------
+  async getAllDepartments(req, res, next) {
+    try {
+      const { status, message, listDepartments } =
+        await handleDepartmentService.getAllDepartments();
+
+      if (status === true) {
+        res.json({ message, listDepartments });
+      } else {
+        res.status(404).json({ message });
+      }
+
+      console.log({ message, listDepartments });
+    } catch (error) {
+      next(new ApiError(400, "Failed to get all departments"));
+    }
+  },
+
   //---------------------------------------------CREATE DEPARTMENT----------------------------------------------------
   async createDepartment(req, res, next) {
     try {

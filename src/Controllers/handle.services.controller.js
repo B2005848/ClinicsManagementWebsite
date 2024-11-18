@@ -57,6 +57,30 @@ const handleServiceManagementController = {
       );
     }
   },
+
+  // --------------------- SEARCH SERVICES-------------------
+  async searchServices(req, res, next) {
+    try {
+      const query = req.query.search;
+      const resultSearch = await handleServicesManagementService.searchServices(
+        query
+      );
+      if (resultSearch.success === true) {
+        return res.status(200).json({
+          message: "Search services successful",
+          data: resultSearch.data,
+        });
+      } else {
+        return res
+          .status(404)
+          .json({ message: "Not found any service with this information" });
+      }
+    } catch (error) {
+      return next(
+        new ApiError(500, "An error occurred while searching service")
+      );
+    }
+  },
 };
 
 module.exports = handleServiceManagementController;
