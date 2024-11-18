@@ -8,4 +8,7 @@ router.get(
   handleServiceController.getServiceByDepartmentId
 );
 
+//============= lẤY DANH SÁCH DỊCH VỤ-
+router.get("/getlistservices", handleServiceController.getServiceForAdmin);
+
 module.exports = router;
