@@ -2,6 +2,60 @@ const ApiError = require("../api-error");
 const handleServicesManagementService = require("../Services/handle.services.service");
 
 const handleServiceManagementController = {
+  // ---------------------- ADD NEW SERVICE ----------------------
+  async addService(req, res, next) {
+    try {
+      const {
+        service_id,
+        service_name,
+        service_fee,
+        duration,
+        description,
+        department_id,
+        specialty_id,
+        is_active,
+      } = req.body;
+
+      // Kiểm tra các trường bắt buộc có trong body không
+      if (
+        !service_id ||
+        !service_name ||
+        !service_fee ||
+        !duration ||
+        !department_id ||
+        !specialty_id
+      ) {
+        return next(new ApiError(400, "Missing required fields"));
+      }
+
+      // Gọi service để thêm dịch vụ mới
+      const result = await handleServicesManagementService.addService({
+        service_id,
+        service_name,
+        service_fee,
+        duration,
+        description,
+        department_id,
+        specialty_id,
+        is_active,
+      });
+
+      if (result.status) {
+        return res.status(201).json({
+          message: result.message,
+          service_id: result.service_id,
+        });
+      } else {
+        return res.status(400).json({
+          message: result.message,
+          error: result.error,
+        });
+      }
+    } catch (error) {
+      console.error("Error occurred while adding service:", error);
+      next(new ApiError(500, "Failed to add service"));
+    }
+  },
   //-----------------------GET SERVICE BY DEPARTMENT_ID-----------------------
   async getServiceByDepartmentId(req, res, next) {
     try {

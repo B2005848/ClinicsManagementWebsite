@@ -1,6 +1,36 @@
 const { knex } = require("../../db.config");
 
 const handleServiceManagement = {
+  // Thêm dịch vụ mới
+  async addService(serviceData) {
+    try {
+      // Insert new service into the SERVICES table
+      const [serviceId] = await knex("SERVICES").insert({
+        service_id: serviceData.service_id,
+        service_name: serviceData.service_name,
+        service_fee: serviceData.service_fee,
+        duration: serviceData.duration,
+        description: serviceData.description,
+        department_id: serviceData.department_id,
+        specialty_id: serviceData.specialty_id,
+        is_active: serviceData.is_active || 1, // Mặc định là 1 nếu không có giá trị
+      });
+
+      return {
+        status: true,
+        message: "Dịch vụ đã được thêm thành công",
+        service_id: serviceId, // Trả về ID của dịch vụ vừa thêm
+      };
+    } catch (error) {
+      console.error("Lỗi khi thêm dịch vụ:", error);
+      return {
+        status: false,
+        message: "Đã xảy ra lỗi khi thêm dịch vụ",
+        error: error.message,
+      };
+    }
+  },
+
   //-----------------------GET SERVICE BY DEPARTMENT_ID-----------------------
   async getServiceByDepartmentId(department_id) {
     try {
