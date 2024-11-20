@@ -54,6 +54,36 @@ const handleServiceManagement = {
     }
   },
 
+  //-----------------------GET SERVICE BY SERVICE_ID-----------------------
+  async getServiceByServiceId(service_id) {
+    try {
+      const data = await knex("SERVICES as se")
+        .select("se.*", "dep.department_name", "spe.specialty_name")
+        .join("DEPARTMENTS as dep", "dep.department_id", "se.department_id")
+        .join("SPECIALTIES as spe", "spe.specialty_id", "se.specialty_id")
+        .where("se.service_id", service_id)
+        .first();
+      if (data) {
+        return {
+          status: true,
+          message: `Get serive by service_id: ${service_id} success`,
+          data: data,
+        };
+      } else {
+        return {
+          status: false,
+          message: "Service Not Found",
+        };
+      }
+    } catch (error) {
+      return {
+        status: false,
+        message: "Error Occured get this service",
+        error: error.message,
+      };
+    }
+  },
+
   // lẤY DANH SÁCH DỊCH VỤ
   async getServiceForAdmin(page) {
     try {

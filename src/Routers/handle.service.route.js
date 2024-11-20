@@ -3,7 +3,7 @@ const router = express.Router();
 const handleServiceController = require("../Controllers/handle.services.controller");
 
 //============= CREATE
-router.get("/create", handleServiceController.addService);
+router.post("/create", handleServiceController.addService);
 
 //============= GET INFORMATION DETAIL PATIENT BY PATIENT_ID
 router.get(
@@ -11,8 +11,11 @@ router.get(
   handleServiceController.getServiceByDepartmentId
 );
 
+//============= GET INFORMATION DETAIL PATIENT BY PATIENT_ID
+router.get("/getdetail/:id", handleServiceController.getDetailService);
+
 //============= lẤY DANH SÁCH DỊCH VỤ-
-router.get("/getlistservices", handleServiceController.getServiceForAdmin);
+router.get("/getlistservices/list", handleServiceController.getServiceForAdmin);
 
 // TÌM KIẾM DỊCH VỤ
 router.get("/search", handleServiceController.searchServices);

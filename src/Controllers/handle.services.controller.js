@@ -76,6 +76,25 @@ const handleServiceManagementController = {
     }
   },
 
+  // Lấy thông tin chi tiết của dịch vụ
+  async getDetailService(req, res, next) {
+    try {
+      const service_id = req.params.id;
+      const data = await handleServicesManagementService.getServiceByServiceId(
+        service_id
+      );
+      if (data) {
+        return res.status(200).json({
+          status: 200,
+          message: data.message,
+          dataInfo: data.data,
+        });
+      }
+    } catch (error) {
+      next(new ApiError(404, "service not exist!"));
+    }
+  },
+
   //-------------------------------- LẤY DANH SÁCH DỊCH VỤ -----------------------------------
   async getServiceForAdmin(req, res, next) {
     try {
