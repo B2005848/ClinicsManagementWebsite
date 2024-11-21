@@ -1,39 +1,40 @@
 const { knex } = require("../../db.config");
 
 const transactionService = {
-  async getFilteredRevenueStatistics({ day, month, year }) {
+  async getFilteredRevenueStatistics({ startDate, endDate, payment_status }) {
     try {
       // Xây dựng truy vấn động
-      const query = knex("TRANSACTIONS")
-        .select(
-          knex.raw("YEAR(transaction_date) AS transaction_year"),
-          knex.raw("MONTH(transaction_date) AS transaction_month"),
-          knex.raw("DAY(transaction_date) AS transaction_day"),
-          knex.raw(`
+      const query = knex("TRANSACTIONS").select(
+        knex.raw("YEAR(transaction_date) AS transaction_year"),
+        knex.raw("MONTH(transaction_date) AS transaction_month"),
+        knex.raw("DAY(transaction_date) AS transaction_day"),
+        knex.raw(`
             SUM(CASE 
               WHEN appointment_id IS NOT NULL THEN amount
               ELSE 0
             END) AS revenue_appointment
           `),
-          knex.raw(`
+        knex.raw(`
             SUM(CASE 
               WHEN prescription_id IS NOT NULL THEN amount
               ELSE 0
             END) AS revenue_prescription
           `),
-          knex.raw("SUM(amount) AS total_revenue")
-        )
-        .where("payment_status", "C");
+        knex.raw("SUM(amount) AS total_revenue")
+      );
 
-      // Áp dụng bộ lọc
-      if (year) {
-        query.andWhere(knex.raw("YEAR(transaction_date) = ?", [year]));
+      // Lọc trạng thái giao dịch
+      if (payment_status) {
+        query.andWhere("payment_status", payment_status);
       }
-      if (month) {
-        query.andWhere(knex.raw("MONTH(transaction_date) = ?", [month]));
-      }
-      if (day) {
-        query.andWhere(knex.raw("DAY(transaction_date) = ?", [day]));
+
+      // Áp dụng bộ lọc khoảng thời gian
+      if (startDate && endDate) {
+        query.andWhereBetween("transaction_date", [startDate, endDate]);
+      } else if (startDate) {
+        query.andWhere("transaction_date", ">=", startDate);
+      } else if (endDate) {
+        query.andWhere("transaction_date", "<=", endDate);
       }
 
       query

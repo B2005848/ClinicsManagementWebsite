@@ -3,20 +3,12 @@ const transactionService = require("../Services/transactions.service");
 const transactionController = {
   async getFilteredRevenueStatistics(req, res, next) {
     try {
-      const { day, month, year } = req.query;
-
-      // Kiểm tra tham số `year` (bắt buộc)
-      if (!year) {
-        return res.status(400).json({
-          status: false,
-          message: "Year is required for filtering revenue statistics.",
-        });
-      }
+      const { startDate, endDate, payment_status } = req.query;
 
       const result = await transactionService.getFilteredRevenueStatistics({
-        day: day ? parseInt(day, 10) : null,
-        month: month ? parseInt(month, 10) : null,
-        year: parseInt(year, 10),
+        startDate,
+        endDate,
+        payment_status,
       });
 
       if (result.status) {
