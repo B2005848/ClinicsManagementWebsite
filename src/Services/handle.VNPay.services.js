@@ -1,4 +1,4 @@
-const { knex } = require("../../db.config"); // Đảm bảo rằng 'knex' đã được khởi tạo đúng
+const { knex } = require("../../db.config");
 const querystring = require("qs");
 const crypto = require("crypto");
 require("dotenv").config(); // Nạp biến môi trường từ tệp .env

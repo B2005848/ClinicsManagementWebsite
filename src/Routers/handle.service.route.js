@@ -20,4 +20,10 @@ router.get("/getlistservices/list", handleServiceController.getServiceForAdmin);
 // TÌM KIẾM DỊCH VỤ
 router.get("/search", handleServiceController.searchServices);
 
+//============= MODIFY SERVICE
+router.patch("/update/:id", handleServiceController.modifyService);
+
+//============= DELETE SERVICE
+router.delete("/delete/:id", handleServiceController.deleteServiceByServiceId);
+
 module.exports = router;

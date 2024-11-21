@@ -33,6 +33,9 @@ const routerServices = require("./Routers/handle.service.route");
 //==========ROUTER FOR API PAYMENT METHOD============>
 const routerPaymentMethod = require("./Routers/handle.paymentmethod.route");
 
+//=========ROUTER FOR API THỐNG KÊ DOANH THU==========>
+const routerRevenue = require("./Routers/transactions.route");
+
 //==========ROUTER FOR API PAYMENT VNPAY==========>
 const routerVNPayMethod = require("./Routers/handle.transaction.vnpay.route");
 const {
@@ -101,6 +104,9 @@ app.use("/api/payment-method", routerPaymentMethod);
 
 //----------------A[I FOR PAYMENT VNPAY-------------
 app.use("/api/VNPay/payment", routerVNPayMethod);
+
+//-----------------------API FOR REVENUE----------
+app.use("/api/statistics/revenue", routerRevenue);
 
 //-----------------------API FOR UPLOAD FILE----------
 app.use("/api/file", upLoadFileRoutes);
