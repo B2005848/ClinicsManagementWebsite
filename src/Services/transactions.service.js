@@ -44,6 +44,7 @@ const transactionService = {
         .orderByRaw(
           "YEAR(transaction_date), MONTH(transaction_date), DAY(transaction_date)"
         );
+      console.log(query.toString());
 
       const data = await query;
 

@@ -3,7 +3,7 @@ const transactionService = require("../Services/transactions.service");
 const transactionController = {
   async getFilteredRevenueStatistics(req, res, next) {
     try {
-      const { startDate, endDate, payment_status } = req.query;
+      const { startDate, endDate, payment_status } = req.body;
 
       const result = await transactionService.getFilteredRevenueStatistics({
         startDate,
@@ -12,6 +12,7 @@ const transactionController = {
       });
 
       if (result.status) {
+        console.log(result.data);
         return res.status(200).json({
           status: true,
           message: "Revenue statistics fetched successfully",
