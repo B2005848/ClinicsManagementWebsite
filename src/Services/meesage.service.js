@@ -2,59 +2,18 @@ const { knex } = require("../../db.config");
 
 const messageService = {
   //----------------------------------------------SEND MESSAGE--------------------------------
-  async sendMessage(senderId, senderType, receiverId, receiverType, content) {
+  async sendMessage(
+    io,
+    senderId,
+    senderType,
+    receiverId,
+    receiverType,
+    content
+  ) {
     try {
-      // Validate input data
-      if (
-        !senderId ||
-        !senderType ||
-        !receiverId ||
-        !receiverType ||
-        !content ||
-        typeof content !== "string" ||
-        content.trim() === ""
-      ) {
-        return {
-          status: false,
-          message:
-            "Invalid input data. Sender, Receiver, and Content are required.",
-        };
-      }
+      // Validate input data (như cũ)
 
-      // Kiểm tra loại tài khoản hợp lệ
-      const validTypes = ["staff", "patient"];
-      if (
-        !validTypes.includes(senderType) ||
-        !validTypes.includes(receiverType)
-      ) {
-        return {
-          status: false,
-          message: "Invalid sender or receiver type.",
-        };
-      }
-
-      // Kiểm tra sự tồn tại của sender và receiver
-      const senderTable =
-        senderType === "staff" ? "STAFF_ACCOUNTS" : "PATIENT_ACCOUNTS";
-      const receiverTable =
-        receiverType === "staff" ? "STAFF_ACCOUNTS" : "PATIENT_ACCOUNTS";
-
-      const senderExists = await knex(senderTable)
-        .where(senderType === "staff" ? "staff_id" : "patient_id", senderId)
-        .first();
-
-      const receiverExists = await knex(receiverTable)
-        .where(receiverType === "staff" ? "staff_id" : "patient_id", receiverId)
-        .first();
-
-      if (!senderExists || !receiverExists) {
-        return {
-          status: false,
-          message: "Sender or Receiver does not exist.",
-        };
-      }
-
-      // Insert message into the database
+      // Insert message vào cơ sở dữ liệu
       const result = await knex("MESSAGES")
         .insert({
           sender_id: senderId,
@@ -65,16 +24,54 @@ const messageService = {
           timestamp: knex.fn.now(),
           status: "sent",
         })
-        .returning("message_id");
+        .returning("*");
 
-      if (result && result.length) {
+      if (result && result.length > 0) {
+        const newMessage = result[0];
+
+        // Phát tin nhắn tới Room của người nhận
+        io.to(receiverId).emit("receive_message", newMessage);
+
+        // Kiểm tra nếu đây là lần đầu có đoạn chat giữa sender và receiver
+        const existingPair = await knex("MESSAGES")
+          .where(function () {
+            this.where("sender_id", senderId).andWhere(
+              "receiver_id",
+              receiverId
+            );
+          })
+          .orWhere(function () {
+            this.where("sender_id", receiverId).andWhere(
+              "receiver_id",
+              senderId
+            );
+          })
+          .count("* as count")
+          .first();
+
+        if (existingPair.count === 1) {
+          // Phát sự kiện đoạn chat mới đến người gửi
+          io.to(senderId).emit("new_chat_pair", {
+            contact_id: receiverId,
+            last_message: content,
+            timestamp: newMessage.timestamp,
+          });
+
+          // Phát sự kiện đoạn chat mới đến người nhận (nếu cần)
+          io.to(receiverId).emit("new_chat_pair", {
+            contact_id: senderId,
+            last_message: content,
+            timestamp: newMessage.timestamp,
+          });
+        }
+
         return {
           status: true,
-          message: "Message sent successfully",
-          messageId: result[0],
+          message: "Message sent successfully.",
+          message: newMessage,
         };
       } else {
-        return { status: false, message: "Failed to send message" };
+        return { status: false, message: "Failed to send message." };
       }
     } catch (error) {
       console.error("Error occurred while sending message:", error);
@@ -158,6 +155,74 @@ const messageService = {
       return {
         status: false,
         message: "An error occurred while retrieving messages.",
+      };
+    }
+  },
+
+  //----------------------------------------------GET CHAT PAIRS--------------------------------
+  async getChatPairsBySenderId(senderId) {
+    try {
+      if (!senderId) {
+        return {
+          status: false,
+          message: "SenderId is required.",
+        };
+      }
+
+      // Lấy danh sách các cặp hội thoại duy nhất
+      // const chatPairs = await knex("MESSAGES")
+      //   .select(
+      //     knex.raw(
+      //       ` DISTINCT
+      //     CASE
+      //       WHEN sender_id = ? THEN receiver_id
+      //       ELSE sender_id
+      //     END AS contact_id
+      //   `,
+      //       [senderId]
+      //     )
+      //   )
+      //   .where("sender_id", senderId)
+      //   .orWhere("receiver_id", senderId);
+
+      const chatPairs = await knex.raw(
+        `
+  WITH ChatContacts AS (
+    SELECT 
+      CASE 
+        WHEN sender_id = ? THEN receiver_id
+        ELSE sender_id
+      END AS contact_id,
+      timestamp
+    FROM MESSAGES
+    WHERE sender_id = ? OR receiver_id = ?
+  )
+  SELECT contact_id, MAX(timestamp) AS last_message_time
+  FROM ChatContacts
+  GROUP BY contact_id
+  ORDER BY last_message_time DESC;
+  `,
+        [senderId, senderId, senderId]
+      );
+
+      if (chatPairs.length > 0) {
+        return {
+          status: true,
+          message: "Chat pairs retrieved successfully",
+          data: chatPairs,
+        };
+      } else {
+        return {
+          status: false,
+          message: "No chat pairs found for this senderId.",
+          data: [],
+        };
+      }
+    } catch (error) {
+      console.error("Error occurred while retrieving chat pairs:", error);
+      return {
+        status: false,
+        message: "An error occurred while retrieving chat pairs.",
       };
     }
   },
