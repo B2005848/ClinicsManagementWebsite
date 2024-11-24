@@ -38,6 +38,8 @@ const routerRevenue = require("./Routers/transactions.route");
 
 //==========ROUTER FOR API PAYMENT VNPAY==========>
 const routerVNPayMethod = require("./Routers/handle.transaction.vnpay.route");
+
+const messageRoutes = require("./Routers/mesage.route");
 const {
   resourceNotFound,
   methodNotAllowed,
@@ -111,6 +113,7 @@ app.use("/api/statistics/revenue", routerRevenue);
 //-----------------------API FOR UPLOAD FILE----------
 app.use("/api/file", upLoadFileRoutes);
 
+app.use("/api/messages", messageRoutes); // Các route liên quan đến tin nhắn
 app.use(resourceNotFound);
 app.use(methodNotAllowed);
 app.use(handleError);
