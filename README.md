@@ -4,6 +4,8 @@
 
 ## Features
 
+# SocketIO
+
 - User account creation and management.
 - Password hashing with `bcrypt`.
 - Gmail-based authentication using `nodemailer` (Gmail).
