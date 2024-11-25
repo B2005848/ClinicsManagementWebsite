@@ -7,6 +7,10 @@ router.post(
   handleAppointmentController.AppointmentBooking
 );
 
+// Đặt lịch và thanh toán tại phòng khám
+// API: POST thêm giao dịch thanh toán tại phòng khám
+router.post("/add", handleAppointmentController.addInClinicTransaction);
+
 // Chỉnh sửa trạng thái đặt lịch
 router.put("/modifyStatus/:id", handleAppointmentController.ModifyStatus);
 

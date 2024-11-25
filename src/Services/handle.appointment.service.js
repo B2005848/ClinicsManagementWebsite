@@ -198,6 +198,29 @@ const handleBookingService = {
     }
   },
 
+  // Thanh toán tại phòng khám với phương thức 1
+  async addTransaction(transactionData) {
+    try {
+      // Insert dữ liệu vào bảng TRANSACTIONS
+      const [transaction] = await knex("TRANSACTIONS")
+        .insert(transactionData)
+        .returning("*");
+      console.log("Transaction added successfully:", transaction);
+
+      return {
+        status: true,
+        message: "Transaction added successfully",
+        data: transaction,
+      };
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+      return {
+        status: false,
+        message: "Failed to add transaction",
+        error,
+      };
+    }
+  },
   //Modify status appointment
   async ModifyStatus(appointment_id, status) {
     try {

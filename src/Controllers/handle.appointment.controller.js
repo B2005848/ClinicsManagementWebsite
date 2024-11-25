@@ -69,6 +69,7 @@ const handleAppointmentController = {
         end_time: req.body.end_time,
         shift_id: req.body.shift_id,
         service_id: req.body.service_id,
+        payment_method_id: req.body.payment_method_id,
         reason: req.body.reason,
       };
 
@@ -87,6 +88,59 @@ const handleAppointmentController = {
       }
     } catch (error) {
       return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
+
+  // Thêm giao dịch chưa thanh toán đối với lịch hẹn thanh toán tại phòng khám
+  async addInClinicTransaction(req, res, next) {
+    try {
+      const {
+        patient_id,
+        appointment_id,
+        amount,
+        payment_method_id = 1,
+        payment_status = "P", // Default "P" for Pending
+        bankCode = "TT",
+      } = req.body;
+
+      // Kiểm tra thông tin hợp lệ
+      if (!patient_id || !appointment_id || !amount || !payment_method_id) {
+        return res.status(400).json({
+          status: false,
+          message: "Missing required fields",
+        });
+      }
+
+      const transactionData = {
+        patient_id,
+        appointment_id,
+        amount,
+        payment_method_id,
+        payment_status,
+        bankCode,
+        transaction_date: new Date(),
+      };
+
+      // Thêm giao dịch mới vào cơ sở dữ liệu
+      const result = await handleAppointmentService.addTransaction(
+        transactionData
+      );
+
+      if (result.status) {
+        return res.status(201).json({
+          status: true,
+          message: "Transaction added successfully",
+          data: result.data,
+        });
+      } else {
+        return res.status(400).json({
+          status: false,
+          message: result.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+      next(new ApiError(500, "Failed to add transaction"));
     }
   },
 

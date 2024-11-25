@@ -45,9 +45,7 @@ const handleVNPAYServices = {
           payment_status: "P", // P: Pending
         })
         .returning("transaction_id");
-      await knex("APPOINTMENTS")
-        .where("appointment_id", appointment_id)
-        .update("payment_method_id", 2);
+
       transaction_id = transaction.transaction_id;
     } catch (error) {
       console.error("Error inserting appointment transaction:", error);
