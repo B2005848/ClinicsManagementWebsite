@@ -129,7 +129,7 @@ const messageService = {
         .orWhere(function () {
           this.where("sender_id", receiverId).andWhere("receiver_id", senderId);
         })
-        .orderBy("timestamp", "asc")
+        .orderBy("timestamp", "desc")
         .limit(itemsPerPage)
         .offset(offset);
 
@@ -169,40 +169,49 @@ const messageService = {
         };
       }
 
-      // Lấy danh sách các cặp hội thoại duy nhất
-      // const chatPairs = await knex("MESSAGES")
-      //   .select(
-      //     knex.raw(
-      //       ` DISTINCT
-      //     CASE
-      //       WHEN sender_id = ? THEN receiver_id
-      //       ELSE sender_id
-      //     END AS contact_id
-      //   `,
-      //       [senderId]
-      //     )
-      //   )
-      //   .where("sender_id", senderId)
-      //   .orWhere("receiver_id", senderId);
-
       const chatPairs = await knex.raw(
         `
-  WITH ChatContacts AS (
-    SELECT 
-      CASE 
-        WHEN sender_id = ? THEN receiver_id
-        ELSE sender_id
-      END AS contact_id,
-      timestamp
-    FROM MESSAGES
-    WHERE sender_id = ? OR receiver_id = ?
-  )
-  SELECT contact_id, MAX(timestamp) AS last_message_time
-  FROM ChatContacts
-  GROUP BY contact_id
-  ORDER BY last_message_time DESC;
-  `,
-        [senderId, senderId, senderId]
+      WITH ChatContacts AS (
+        SELECT 
+          CASE 
+            WHEN sender_id = ? THEN receiver_id
+            ELSE sender_id
+          END AS contact_id,
+          MAX(timestamp) AS last_message_time
+        FROM MESSAGES
+        WHERE sender_id = ? OR receiver_id = ?
+        GROUP BY sender_id, receiver_id
+      ),
+      RankedChatPairs AS (
+        SELECT
+          c.contact_id, 
+          c.last_message_time,
+          COALESCE(p.first_name, s.first_name) AS first_name,
+          COALESCE(p.last_name, s.last_name) AS last_name,
+          COALESCE(p.image_avt, s.image_avt) AS image_avt,
+          -- Lấy nội dung tin nhắn cuối cùng (sửa tên cột message_content thành content hoặc tên chính xác)
+          (SELECT TOP 1 content  -- Sửa cột message_content thành content hoặc cột tương ứng
+           FROM MESSAGES
+           WHERE (sender_id = c.contact_id AND receiver_id = ?) 
+              OR (sender_id = ? AND receiver_id = c.contact_id)
+           ORDER BY timestamp DESC) AS last_message,
+          ROW_NUMBER() OVER (PARTITION BY c.contact_id ORDER BY c.last_message_time DESC) AS rn
+        FROM ChatContacts c
+        LEFT JOIN PATIENT_DETAILS p ON c.contact_id = p.patient_id
+        LEFT JOIN STAFF_DETAILS s ON c.contact_id = s.staff_id
+      )
+      SELECT
+        contact_id,
+        last_message_time,
+        first_name,
+        last_name,
+        image_avt,
+        last_message -- Thêm tin nhắn cuối cùng vào kết quả
+      FROM RankedChatPairs
+      WHERE rn = 1
+      ORDER BY last_message_time DESC;
+    `,
+        [senderId, senderId, senderId, senderId, senderId]
       );
 
       if (chatPairs.length > 0) {
