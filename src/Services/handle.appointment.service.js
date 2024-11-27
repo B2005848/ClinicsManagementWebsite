@@ -99,6 +99,7 @@ const handleBookingService = {
         .select(
           "ap.appointment_id",
           "ap.created_at",
+          "ap.updated_at",
           "ap.staff_id",
           "sd.first_name",
           "sd.last_name",
