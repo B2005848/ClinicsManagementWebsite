@@ -8,6 +8,9 @@ router.post("/createAccount", accountStaffController.createAccount);
 //=========CHECK ADMIN LOGIN=============
 router.post("/adminLogin", accountStaffController.checkAdminLogin);
 
+//=========CHECK DOCTOR LOGIN=============
+router.post("/doctorLogin", accountStaffController.checkDoctorLogin);
+
 //==========CHECK EXPIRE OF ACESS TOKEN===========
 router.post("/checkExipredAcessToken", accountStaffController.checkAccessToken);
 
