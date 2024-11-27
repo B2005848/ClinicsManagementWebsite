@@ -139,7 +139,7 @@ const accountStaffService = {
               staff_id: usernameExisting.staff_id,
               username: usernameExisting.first_name,
             },
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET_DOC,
             {
               // expiresIn 120 minute
               expiresIn: "120m",
@@ -152,6 +152,69 @@ const accountStaffService = {
               staff_id: usernameExisting.staff_id,
             },
             process.env.JWT_SECRET_DOC,
+            // expiresIn 7 day
+            {
+              expiresIn: "7d",
+            }
+          );
+
+          const accessTokenExpiry = Math.floor(Date.now() / 1000) + 120 * 60; // 120 phút
+          const refreshTokenExpiry =
+            Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60; // 7 ngày
+          console.log(`accessTokenExpiry: ${accessTokenExpiry}`);
+          console.log(`refreshTokenExpiry: ${refreshTokenExpiry}`);
+
+          return {
+            success: true,
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            accessTokenExpiry: accessTokenExpiry,
+            refreshTokenExpiry: refreshTokenExpiry,
+          };
+        } else {
+          console.log(`Incorrect password for username: ${username}`);
+          return { success: false, message: "Incorrect password" };
+        }
+      } else {
+        console.log(`Username not found: ${username}`);
+        return { success: false, message: "Username not found" };
+      }
+    } catch (error) {
+      console.error("Error during login check:", error);
+      throw error;
+    }
+  },
+
+  async checkReceptionLogin(username, password) {
+    try {
+      const usernameExisting = await knex("STAFF_ACCOUNTS")
+        .where("staff_id", username)
+        .andWhere("role_id", "LT")
+        .first();
+      if (usernameExisting) {
+        const salt = usernameExisting.salt;
+        const passwd_hash = await bcrypt.hash(password, salt);
+        if (passwd_hash === usernameExisting.password) {
+          console.log(`Login success with username: ${username}`);
+          // Create access Token
+          const accessToken = jwt.sign(
+            {
+              staff_id: usernameExisting.staff_id,
+              username: usernameExisting.first_name,
+            },
+            process.env.JWT_SECRET_RE,
+            {
+              // expiresIn 120 minute
+              expiresIn: "120m",
+            }
+          );
+
+          // Create refresh Token
+          const refreshToken = jwt.sign(
+            {
+              staff_id: usernameExisting.staff_id,
+            },
+            process.env.JWT_SECRET_RE,
             // expiresIn 7 day
             {
               expiresIn: "7d",

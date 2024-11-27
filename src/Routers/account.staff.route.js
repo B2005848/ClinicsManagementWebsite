@@ -11,6 +11,9 @@ router.post("/adminLogin", accountStaffController.checkAdminLogin);
 //=========CHECK DOCTOR LOGIN=============
 router.post("/doctorLogin", accountStaffController.checkDoctorLogin);
 
+//=========CHECK RECEPTIONIST LOGIN=============
+router.post("/recepLogin", accountStaffController.checkReceptionLogin);
+
 //==========CHECK EXPIRE OF ACESS TOKEN===========
 router.post("/checkExipredAcessToken", accountStaffController.checkAccessToken);
 

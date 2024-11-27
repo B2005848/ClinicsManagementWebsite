@@ -147,6 +147,38 @@ const accountStaffController = {
     }
   },
 
+  // ----------------------------------LOGIN RECEPTIONIST SERVICE----------------------------------------------------------
+  async checkReceptionLogin(req, res, next) {
+    try {
+      const username = req.body?.username;
+      const password = req.body?.password;
+
+      if (!username) {
+        return next(new ApiError(400, "Username is required"));
+      }
+      if (!password) {
+        return next(new ApiError(400, "Password is required"));
+      }
+      const resultCheckLogin = await accountStaffService.checkReceptionLogin(
+        username,
+        password
+      );
+      if (resultCheckLogin.success === true) {
+        return res.status(200).json({
+          message: `${username} login successful`,
+          accessToken: resultCheckLogin.accessToken,
+          refreshToken: resultCheckLogin.refreshToken,
+          accessTokenExpiry: resultCheckLogin.accessTokenExpiry,
+          refreshTokenExpiry: resultCheckLogin.refreshTokenExpiry,
+        });
+      } else {
+        return next(new ApiError(400, "Invalid username or password"));
+      }
+    } catch (error) {
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
+
   // ----------------------------------REFRESH ACCESS TOKEN----------------------------------------------------------
   async refreshAccessToken(req, res, next) {
     try {
