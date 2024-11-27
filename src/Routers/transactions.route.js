@@ -10,4 +10,10 @@ router.get(
   "/payment-history-appointment/:patientId",
   transactionController.getPaymentHistoryByAppointment
 );
+
+// Lấy tổng doanh thu của bệnh nhân theo năm
+router.get(
+  "/total-revenue/:patientId",
+  transactionController.getTotalRevenueByYear
+);
 module.exports = router;

@@ -59,10 +59,10 @@ const transactionService = {
     }
   },
 
-  // Lấy lịch sử thanh toán DỊCH VỤ ĐẶT LỊCH HẸN KHÁM BỆNH của bệnh nhân
-  async getPaymentHistoryByAppointment(patientId) {
+  // Lấy lịch sử thanh toán DỊCH VỤ ĐẶT LỊCH HẸN KHÁM BỆNH của bệnh nhân theo năm
+  async getPaymentHistoryByAppointment(patientId, year) {
     try {
-      // Truy vấn lịch sử thanh toán theo patient_id và các thông tin chi tiết liên quan
+      // Truy vấn lịch sử thanh toán theo patient_id và các thông tin chi tiết liên quan, thêm điều kiện lọc theo năm
       const query = knex("TRANSACTIONS as t")
         .select(
           "t.transaction_id",
@@ -80,6 +80,7 @@ const transactionService = {
         .innerJoin("SERVICES as s", "a.service_id", "s.service_id")
         .where("t.patient_id", patientId)
         .andWhereNot("a.appointment_id", null) // Đảm bảo chỉ lấy những giao dịch liên quan đến lịch hẹn
+        .andWhereRaw("YEAR(t.transaction_date) = ?", [year]) // Lọc theo năm của transaction_date
         .orderBy("t.transaction_date", "desc"); // Sắp xếp theo ngày giao dịch
 
       const data = await query;
@@ -87,7 +88,7 @@ const transactionService = {
       if (data.length === 0) {
         return {
           status: false,
-          message: "No payment history found for this patient.",
+          message: `No payment history found for this patient in ${year}.`,
         };
       }
 
@@ -97,6 +98,51 @@ const transactionService = {
       return {
         status: false,
         message: "Failed to fetch payment history",
+        error,
+      };
+    }
+  },
+
+  // Lấy tổng doanh thu cho bệnh nhân trong năm theo trạng thái C (Hoàn thành)
+  async getTotalRevenueByYear(patientId, year) {
+    try {
+      const query = knex("TRANSACTIONS as t")
+        .select(
+          "t.transaction_id",
+          "t.amount",
+          "t.transaction_date",
+          "t.payment_status",
+          "t.bankCode"
+        )
+        .where("t.patient_id", patientId)
+        .andWhereRaw("YEAR(t.transaction_date) = ?", [year]) // Lọc theo năm
+        .andWhere("t.payment_status", "C") // Chỉ lấy giao dịch có trạng thái "C" (Hoàn thành)
+        .orderBy("t.transaction_date", "desc");
+
+      const data = await query;
+
+      if (data.length === 0) {
+        return {
+          status: false,
+          message: `No completed transactions found for this patient in ${year}.`,
+        };
+      }
+
+      // Tính tổng tiền các giao dịch đã hoàn thành
+      const totalRevenue = data.reduce(
+        (sum, transaction) => sum + transaction.amount,
+        0
+      );
+
+      return {
+        status: true,
+        total_revenue: totalRevenue,
+      };
+    } catch (error) {
+      console.error("Error fetching total revenue:", error);
+      return {
+        status: false,
+        message: "Failed to fetch total revenue",
         error,
       };
     }
