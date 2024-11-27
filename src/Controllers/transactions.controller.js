@@ -29,6 +29,33 @@ const transactionController = {
       next(new ApiError(500, "Failed to fetch revenue statistics"));
     }
   },
+
+  // Lấy lịch sử thanh toán DỊCH VỤ ĐẶT LỊCH HẸN KHÁM BỆNH của bệnh nhân
+  async getPaymentHistoryByAppointment(req, res, next) {
+    try {
+      const { patientId } = req.params; // patientId passed as a URL parameter
+
+      const result = await transactionService.getPaymentHistoryByAppointment(
+        patientId
+      );
+
+      if (result.status) {
+        return res.status(200).json({
+          status: true,
+          message: "Payment history fetched successfully",
+          data: result.data,
+        });
+      } else {
+        return res.status(400).json({
+          status: false,
+          message: result.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching payment history by appointment:", error);
+      next(new ApiError(500, "Failed to fetch payment history"));
+    }
+  },
 };
 
 module.exports = transactionController;

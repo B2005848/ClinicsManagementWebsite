@@ -58,6 +58,49 @@ const transactionService = {
       };
     }
   },
+
+  // Lấy lịch sử thanh toán DỊCH VỤ ĐẶT LỊCH HẸN KHÁM BỆNH của bệnh nhân
+  async getPaymentHistoryByAppointment(patientId) {
+    try {
+      // Truy vấn lịch sử thanh toán theo patient_id và các thông tin chi tiết liên quan
+      const query = knex("TRANSACTIONS as t")
+        .select(
+          "t.transaction_id",
+          "t.amount",
+          "t.transaction_date",
+          "t.payment_status",
+          "t.bankCode",
+          "a.appointment_id",
+          "a.appointment_date",
+          "s.service_name",
+          "a.start_time",
+          "a.end_time"
+        )
+        .innerJoin("APPOINTMENTS as a", "t.appointment_id", "a.appointment_id")
+        .innerJoin("SERVICES as s", "a.service_id", "s.service_id")
+        .where("t.patient_id", patientId)
+        .andWhereNot("a.appointment_id", null) // Đảm bảo chỉ lấy những giao dịch liên quan đến lịch hẹn
+        .orderBy("t.transaction_date", "desc"); // Sắp xếp theo ngày giao dịch
+
+      const data = await query;
+
+      if (data.length === 0) {
+        return {
+          status: false,
+          message: "No payment history found for this patient.",
+        };
+      }
+
+      return { status: true, data };
+    } catch (error) {
+      console.error("Error fetching payment history by appointment:", error);
+      return {
+        status: false,
+        message: "Failed to fetch payment history",
+        error,
+      };
+    }
+  },
 };
 
 module.exports = transactionService;
