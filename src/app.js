@@ -74,6 +74,16 @@ app.use(
   },
   express.static(path.join(__dirname, "uploads/avtStaffs"))
 );
+
+// ----------------------- API GET FILE AVATAR PATIENT----------
+app.use(
+  "/uploads/avtPatients",
+  (req, res, next) => {
+    console.log(`Request for: ${req.url}`);
+    next();
+  },
+  express.static(path.join(__dirname, "uploads/avtPatients"))
+);
 // ----------------------------API FOR PATIENTS----------------
 app.use("/api/patient/account", routerAccountPatient);
 app.use("/api/handle/patient", routerPatient);
