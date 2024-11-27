@@ -133,7 +133,7 @@ const accountStaffController = {
       );
       if (resultCheckLogin.success === true) {
         return res.status(200).json({
-          message: "Admin login successful",
+          message: `${username} login successful`,
           accessToken: resultCheckLogin.accessToken,
           refreshToken: resultCheckLogin.refreshToken,
           accessTokenExpiry: resultCheckLogin.accessTokenExpiry,

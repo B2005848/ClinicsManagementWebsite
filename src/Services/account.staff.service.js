@@ -151,7 +151,7 @@ const accountStaffService = {
             {
               staff_id: usernameExisting.staff_id,
             },
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET_DOC,
             // expiresIn 7 day
             {
               expiresIn: "7d",
