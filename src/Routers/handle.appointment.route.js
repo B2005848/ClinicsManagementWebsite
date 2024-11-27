@@ -7,6 +7,12 @@ router.post(
   handleAppointmentController.AppointmentBooking
 );
 
+// Lấy danh sách lịch hẹn có status = 'CO-F', payment_status = 'C' và theo staff_id
+router.get(
+  "/status-payment-staff",
+  handleAppointmentController.getAppointmentsWithStatusPaymentAndStaff
+);
+
 // Đặt lịch và thanh toán tại phòng khám
 // API: POST thêm giao dịch thanh toán tại phòng khám
 router.post("/add", handleAppointmentController.addInClinicTransaction);

@@ -345,6 +345,99 @@ const handleBookingService = {
       };
     }
   },
+
+  // Lọc danh sách lịch hẹn có status = 'CO-F', payment_status = 'C' và theo staff_id
+  async getAppointmentsWithStatusPaymentAndStaff(page, staff_id) {
+    try {
+      const itemsPerPage = 10; // Số lượng lịch hẹn trên mỗi trang
+      const offset = (page - 1) * itemsPerPage; // Tính offset dựa trên số trang
+
+      // Lấy tổng số lượng lịch hẹn với các điều kiện đã cho
+      const totalAppointments = await knex("APPOINTMENTS as ap")
+        .join("TRANSACTIONS as t", "t.appointment_id", "ap.appointment_id")
+        .where("ap.status", "CO-F")
+        .andWhere("t.payment_status", "C")
+        .andWhere("ap.staff_id", staff_id) // Thêm điều kiện lọc theo staff_id
+        .count("* as totalCount")
+        .first();
+      const totalAppointmentsCount = totalAppointments.totalCount;
+
+      // Tính tổng số trang
+      const totalPages = Math.ceil(totalAppointmentsCount / itemsPerPage);
+
+      // Kiểm tra nếu trang yêu cầu vượt quá tổng số trang
+      if (page > totalPages) {
+        return {
+          status: false,
+          message: `Trang ${page} vượt quá số trang tối đa (${totalPages}). Không có lịch hẹn nào.`,
+          totalPages,
+          appointmentList: [],
+        };
+      }
+
+      // Lấy danh sách lịch hẹn theo trang với các điều kiện đã cho
+      const appointmentList = await knex("APPOINTMENTS as ap")
+        .select(
+          "ap.appointment_id",
+          "ap.patient_id",
+          "pd.first_name as patient_firstname",
+          "pd.last_name as patient_lastname",
+          "ap.staff_id",
+          "sd.first_name as doctor_firstname",
+          "sd.last_name as doctor_lastname",
+          "ap.department_id",
+          "dep.department_name",
+          "ap.service_id",
+          "se.service_name",
+          "ap.appointment_date",
+          "ap.start_time",
+          "ap.end_time",
+          knex.raw("TRIM(ap.status) as status"),
+          "ap.reason",
+          "ap.created_at",
+          "ap.updated_at"
+        )
+        .join("PATIENT_DETAILS as pd", "pd.patient_id", "ap.patient_id")
+        .join("STAFF_DETAILS as sd", "sd.staff_id", "ap.staff_id")
+        .join("DEPARTMENTS as dep", "dep.department_id", "ap.department_id")
+        .join("SERVICES as se", "se.service_id", "ap.service_id")
+        .join("TRANSACTIONS as t", "t.appointment_id", "ap.appointment_id")
+        .where("ap.status", "CO-F")
+        .andWhere("t.payment_status", "C")
+        .andWhere("ap.staff_id", staff_id) // Lọc theo staff_id
+        .orderBy("ap.appointment_id", "asc")
+        .limit(itemsPerPage)
+        .offset(offset);
+
+      // Kiểm tra nếu danh sách lịch hẹn trống
+      if (appointmentList.length === 0) {
+        console.log(
+          "Danh sách lịch hẹn trống. Kiểm tra lại cơ sở dữ liệu hoặc liên hệ admin."
+        );
+        return {
+          status: false,
+          message: "Danh sách lịch hẹn trống",
+          totalPages,
+          appointmentList,
+          itemsPerPage,
+        };
+      } else {
+        console.log(
+          `Lấy danh sách lịch hẹn thành công. Tổng số lịch hẹn: ${totalAppointmentsCount}`
+        );
+        return {
+          status: true,
+          message: "Danh sách lịch hẹn lấy thành công",
+          totalPages,
+          appointmentList,
+          itemsPerPage,
+        };
+      }
+    } catch (error) {
+      console.error("Lỗi trong quá trình lấy danh sách lịch hẹn:", error);
+      throw error;
+    }
+  },
 };
 
 module.exports = handleBookingService;

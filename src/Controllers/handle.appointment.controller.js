@@ -219,6 +219,48 @@ const handleAppointmentController = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  // Lọc danh sách lịch hẹn có status = 'CO-F', payment_status = 'C' và theo staff_id
+  async getAppointmentsWithStatusPaymentAndStaff(req, res, next) {
+    try {
+      // Lấy trang từ query, mặc định là trang 1 nếu không có giá trị
+      const page = parseInt(req.query.page) || 1;
+      const staff_id = req.query.staff_id; // Lấy staff_id từ query parameters
+
+      // Kiểm tra nếu staff_id không có trong request
+      if (!staff_id) {
+        return res.status(400).json({
+          status: false,
+          message: "staff_id is required",
+        });
+      }
+
+      // Gọi phương thức service để lấy danh sách lịch hẹn theo các điều kiện
+      const result =
+        await handleAppointmentService.getAppointmentsWithStatusPaymentAndStaff(
+          page,
+          staff_id
+        );
+
+      // Kiểm tra kết quả và gửi phản hồi
+      if (result.status === true) {
+        res.status(200).json({
+          message: result.message,
+          totalPages: result.totalPages,
+          appointmentList: result.appointmentList,
+          itemsPerPage: result.itemsPerPage,
+        });
+      } else {
+        res.status(204).json({
+          message: result.message,
+          totalPages: result.totalPages,
+          appointmentList: result.appointmentList,
+        });
+      }
+    } catch (error) {
+      return next(new ApiError(500, "Lỗi máy chủ nội bộ"));
+    }
+  },
 };
 
 module.exports = handleAppointmentController;
