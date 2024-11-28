@@ -16,6 +16,9 @@ const accountPatientControllers = {
       const citizen_id = req.body?.citizen_id;
       const address_contact = req.body?.address_contact;
       const health_insurance_id = req.body?.health_insurance_id;
+      const nationality = req.body?.nationality;
+      const religion = req.body?.religion;
+      const nation = req.body?.nation;
       if (!first_name && !last_name) {
         return next(new ApiError(400, "Name is required"));
       }
@@ -47,6 +50,9 @@ const accountPatientControllers = {
         citizen_id: citizen_id,
         address_contact: address_contact,
         health_insurance_id: health_insurance_id,
+        nation: nation,
+        religion: religion,
+        nationality: nationality,
       };
       const resultCreate_account = await accountPatientServices.createAccount(
         accountData,

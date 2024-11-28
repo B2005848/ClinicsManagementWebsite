@@ -78,7 +78,7 @@ const handleDepartment = {
       // Get totals quantity departments
       const totalDepartments = await knex("DEPARTMENTS")
         .count("* as totalCount")
-        .whereNot("department_id", "CASH")
+        .whereNot("department_id", "RECEP")
         .first();
       const totalItems = totalDepartments.totalCount;
       // Calculate quantity page
@@ -94,7 +94,7 @@ const handleDepartment = {
       // Get departments
       const departments = await knex("DEPARTMENTS")
         .orderBy("department_id", "asc")
-        .whereNot("department_id", "CASH")
+        .whereNot("department_id", "RECEP")
         .limit(itemsPerPage)
         .offset(offset);
 
