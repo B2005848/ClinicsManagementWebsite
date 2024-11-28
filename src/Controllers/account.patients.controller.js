@@ -10,6 +10,12 @@ const accountPatientControllers = {
       const username = req.body?.username;
       const password = req.body?.password;
       const phone = req.body?.phone;
+      const email = req.body?.email;
+      const gender = req.body?.gender;
+      const major = req.body?.major;
+      const citizen_id = req.body?.citizen_id;
+      const address_contact = req.body?.address_contact;
+      const health_insurance_id = req.body?.health_insurance_id;
       if (!first_name && !last_name) {
         return next(new ApiError(400, "Name is required"));
       }
@@ -35,7 +41,12 @@ const accountPatientControllers = {
         last_name: last_name,
         birthday: birthday,
         phone_number: phone,
-        email: username,
+        email: email,
+        gender: gender,
+        major: major,
+        citizen_id: citizen_id,
+        address_contact: address_contact,
+        health_insurance_id: health_insurance_id,
       };
       const resultCreate_account = await accountPatientServices.createAccount(
         accountData,
