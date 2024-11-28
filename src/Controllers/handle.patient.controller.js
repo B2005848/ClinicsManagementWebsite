@@ -105,6 +105,14 @@ const handlePatientController = {
       diagnosis,
       treatment,
       reason,
+      weight,
+      height,
+      blood_pressure,
+      heart_rate,
+      temperature,
+      respiratory_rate,
+      blood_sugar,
+      cholesterol,
     } = req.body;
 
     // Kiểm tra thông tin đầu vào
@@ -130,6 +138,14 @@ const handlePatientController = {
         diagnosis,
         treatment,
         reason,
+        weight,
+        height,
+        blood_pressure,
+        heart_rate,
+        temperature,
+        respiratory_rate,
+        blood_sugar,
+        cholesterol,
       });
 
       if (result.status) {

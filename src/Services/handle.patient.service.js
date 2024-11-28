@@ -160,6 +160,14 @@ const handlePatientService = {
     diagnosis,
     treatment,
     reason,
+    weight,
+    height,
+    blood_pressure,
+    heart_rate,
+    temperature,
+    respiratory_rate,
+    blood_sugar,
+    cholesterol,
   }) {
     try {
       // Thêm thông tin hồ sơ bệnh nhân vào bảng PATIENT_RECORDS
@@ -180,6 +188,18 @@ const handlePatientService = {
           message: "Failed to create patient record.",
         };
       }
+
+      await knex("HEALTH_METRICS").insert({
+        record_id: result[0].record_id,
+        weight,
+        height,
+        blood_pressure,
+        heart_rate,
+        temperature,
+        respiratory_rate,
+        blood_sugar,
+        cholesterol,
+      });
 
       return {
         status: true,
