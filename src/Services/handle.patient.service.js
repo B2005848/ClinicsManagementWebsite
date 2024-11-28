@@ -151,6 +151,50 @@ const handlePatientService = {
       };
     }
   },
+
+  // Tạo hồ sơ bệnh nhân cho lịch hẹn
+  async createPatientRecord({
+    patient_id,
+    doctor_id,
+    appointment_id,
+    diagnosis,
+    treatment,
+    reason,
+  }) {
+    try {
+      // Thêm thông tin hồ sơ bệnh nhân vào bảng PATIENT_RECORDS
+      const result = await knex("PATIENT_RECORDS")
+        .insert({
+          patient_id,
+          doctor_id, // ID của nhân viên tạo hồ sơ
+          appointment_id, // ID của lịch hẹn
+          diagnosis, // Chẩn đoán
+          treatment, // Điều trị
+          reason, // Lý do khám
+        })
+        .returning("record_id");
+
+      if (!result) {
+        return {
+          status: false,
+          message: "Failed to create patient record.",
+        };
+      }
+
+      return {
+        status: true,
+        message: "Patient record created successfully.",
+        record_id: result[0].record_id, // Trả về record_id của hồ sơ đã được tạo
+      };
+    } catch (error) {
+      console.error("Error creating patient record:", error);
+      return {
+        status: false,
+        message: "Failed to create patient record.",
+        error,
+      };
+    }
+  },
 };
 
 module.exports = handlePatientService;

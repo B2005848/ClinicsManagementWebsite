@@ -19,4 +19,7 @@ router.patch(
 
 //================ SEARCH PATIENT====================
 router.get("/search", handlePatientController.searchPatients);
+
+// API: Tạo hồ sơ bệnh nhân theo lịch hẹn dành cho chức năng của bác sĩ
+router.post("/create", handlePatientController.createPatientRecord);
 module.exports = router;

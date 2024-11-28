@@ -95,6 +95,58 @@ const handlePatientController = {
       );
     }
   },
+
+  // Tạo hồ sơ bệnh án theo lịch hẹn
+  async createPatientRecord(req, res) {
+    const {
+      patient_id,
+      doctor_id,
+      appointment_id,
+      diagnosis,
+      treatment,
+      reason,
+    } = req.body;
+
+    // Kiểm tra thông tin đầu vào
+    if (
+      !patient_id ||
+      !doctor_id ||
+      !appointment_id ||
+      !diagnosis ||
+      !treatment ||
+      !reason
+    ) {
+      return res.status(400).json({
+        status: false,
+        message: "Missing required fields.",
+      });
+    }
+
+    try {
+      const result = await handlePatientService.createPatientRecord({
+        patient_id,
+        doctor_id,
+        appointment_id,
+        diagnosis,
+        treatment,
+        reason,
+      });
+
+      if (result.status) {
+        console.log("Tạo thành công hồ sơ", result);
+        return res.status(200).json(result);
+      }
+
+      return res.status(500).json(result);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        status: false,
+        message: "Error creating patient record.",
+        error,
+      });
+    }
+  },
 };
 
 module.exports = handlePatientController;
