@@ -5,11 +5,12 @@ const transactionController = {
     try {
       const { startDate, endDate, payment_status } = req.body;
 
-      const result = await transactionService.getFilteredRevenueStatistics({
-        startDate,
-        endDate,
-        payment_status,
-      });
+      const result =
+        await transactionService.getFilteredRevenueStatisticsByService({
+          startDate,
+          endDate,
+          payment_status,
+        });
 
       if (result.status) {
         console.log(result.data);

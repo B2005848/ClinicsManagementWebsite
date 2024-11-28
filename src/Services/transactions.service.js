@@ -1,48 +1,59 @@
 const { knex } = require("../../db.config");
 
 const transactionService = {
-  async getFilteredRevenueStatistics({ startDate, endDate, payment_status }) {
+  async getFilteredRevenueStatisticsByService({
+    startDate,
+    endDate,
+    payment_status,
+  }) {
     try {
       // Xây dựng truy vấn động
-      const query = knex("TRANSACTIONS").select(
-        knex.raw("YEAR(transaction_date) AS transaction_year"),
-        knex.raw("MONTH(transaction_date) AS transaction_month"),
-        knex.raw("DAY(transaction_date) AS transaction_day"),
-        knex.raw(`
-            SUM(CASE 
-              WHEN appointment_id IS NOT NULL THEN amount
-              ELSE 0
-            END) AS revenue_appointment
-          `),
+      const query = knex("TRANSACTIONS as t")
+        .join("APPOINTMENTS as a", "t.appointment_id", "a.appointment_id") // Kết nối với bảng appointments
+        .join("SERVICES as s", "a.service_id", "s.service_id") // Kết nối với bảng services qua bảng appointments
+        .select(
+          knex.raw("YEAR(t.transaction_date) AS transaction_year"),
+          knex.raw("MONTH(t.transaction_date) AS transaction_month"),
+          knex.raw("DAY(t.transaction_date) AS transaction_day"),
+          knex.raw("s.service_id"),
+          knex.raw("s.service_name"),
+          knex.raw(`
+          SUM(CASE 
+            WHEN t.appointment_id IS NOT NULL THEN t.amount
+            ELSE 0
+          END) AS revenue_appointment
+        `),
+          knex.raw("SUM(t.amount) AS total_revenue")
+        );
 
-        knex.raw("SUM(amount) AS total_revenue")
-      );
-
-      // Lọc trạng thái giao dịch
+      // Lọc trạng thái thanh toán
       if (payment_status) {
-        query.andWhere("payment_status", payment_status);
+        query.andWhere("t.payment_status", payment_status);
       }
 
       // Áp dụng bộ lọc khoảng thời gian
       if (startDate && endDate) {
-        query.andWhereBetween("transaction_date", [startDate, endDate]);
+        query.andWhereBetween("t.transaction_date", [startDate, endDate]);
       } else if (startDate) {
-        query.andWhere("transaction_date", ">=", startDate);
+        query.andWhere("t.transaction_date", ">=", startDate);
       } else if (endDate) {
-        query.andWhere("transaction_date", "<=", endDate);
+        query.andWhere("t.transaction_date", "<=", endDate);
       }
 
       query
         .groupByRaw(
-          "YEAR(transaction_date), MONTH(transaction_date), DAY(transaction_date)"
+          "YEAR(t.transaction_date), MONTH(t.transaction_date), DAY(t.transaction_date), s.service_id, s.service_name"
         )
         .orderByRaw(
-          "YEAR(transaction_date), MONTH(transaction_date), DAY(transaction_date)"
+          "YEAR(t.transaction_date), MONTH(t.transaction_date), DAY(t.transaction_date), s.service_id"
         );
-      console.log(query.toString());
 
+      console.log(query.toString()); // In ra truy vấn SQL để kiểm tra
+
+      // Thực thi truy vấn và lấy dữ liệu
       const data = await query;
 
+      // Trả về kết quả
       return { status: true, data };
     } catch (error) {
       console.error("Error fetching filtered revenue statistics:", error);
@@ -53,7 +64,6 @@ const transactionService = {
       };
     }
   },
-
   // Lấy lịch sử thanh toán DỊCH VỤ ĐẶT LỊCH HẸN KHÁM BỆNH của bệnh nhân theo năm
   async getPaymentHistoryByAppointment(patientId, year) {
     try {
