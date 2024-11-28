@@ -147,6 +147,42 @@ const transactionService = {
       };
     }
   },
+
+  // Hàm cập nhật trạng thái giao dịch
+  async updateTransactionStatus(transactionId, newStatus) {
+    try {
+      // X: là trạng thái chưa thanh toán
+      // P: đang xử lí
+      // C: đã thanh toán
+      // F: với VNPay thanh toán thất bại
+
+      // Cập nhật trạng thái giao dịch
+      const result = await knex("TRANSACTIONS")
+        .where("transaction_id", transactionId)
+        .update({
+          payment_status: newStatus,
+        });
+
+      if (result === 0) {
+        return {
+          status: false,
+          message: "Transaction not found or no change in status.",
+        };
+      }
+
+      return {
+        status: true,
+        message: `Transaction status updated to ${newStatus}.`,
+      };
+    } catch (error) {
+      console.error("Error updating transaction status:", error);
+      return {
+        status: false,
+        message: "Failed to update transaction status.",
+        error,
+      };
+    }
+  },
 };
 
 module.exports = transactionService;

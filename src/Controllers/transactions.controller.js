@@ -95,6 +95,35 @@ const transactionController = {
       next(new ApiError(500, "Failed to fetch total revenue"));
     }
   },
+
+  // Cập nhật trạng thái giao dịch
+  async updateTransactionStatus(req, res, next) {
+    try {
+      const { transactionId } = req.params; // ID giao dịch từ URL params
+      const { newStatus } = req.body; // Trạng thái mới từ body
+
+      // Gọi service để cập nhật trạng thái giao dịch
+      const result = await transactionService.updateTransactionStatus(
+        transactionId,
+        newStatus
+      );
+
+      if (result.status) {
+        return res.status(200).json({
+          status: true,
+          message: result.message,
+        });
+      } else {
+        return res.status(400).json({
+          status: false,
+          message: result.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating transaction status:", error);
+      next(new ApiError(500, "Failed to update transaction status"));
+    }
+  },
 };
 
 module.exports = transactionController;

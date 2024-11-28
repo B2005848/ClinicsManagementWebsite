@@ -16,4 +16,10 @@ router.get(
   "/total-revenue/:patientId",
   transactionController.getTotalRevenueByYear
 );
+
+// API: Cập nhật trạng thái giao dịch
+router.put(
+  "/update-status/:transactionId",
+  transactionController.updateTransactionStatus
+);
 module.exports = router;
