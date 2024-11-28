@@ -99,7 +99,7 @@ const handleAppointmentController = {
         appointment_id,
         amount,
         payment_method_id = 1,
-        payment_status = "P", // Default "P" for Pending
+        payment_status = "X", // Default "P" for Pending
         bankCode = "TT",
       } = req.body;
 

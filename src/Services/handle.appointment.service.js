@@ -45,6 +45,7 @@ const handleBookingService = {
           "ap.start_time",
           "ap.end_time",
           knex.raw("TRIM(ap.status) as status"),
+          knex.raw("TRIM(t.payment_status) as payment_status"),
           "ap.reason",
           "ap.created_at",
           "ap.updated_at"
@@ -53,6 +54,7 @@ const handleBookingService = {
         .join("STAFF_DETAILS as sd", "sd.staff_id", "ap.staff_id")
         .join("DEPARTMENTS as dep", "dep.department_id", "ap.department_id")
         .join("SERVICES as se", "se.service_id", "ap.service_id")
+        .join("TRANSACTIONS as t", "t.appointment_id", "ap.appointment_id")
         .orderBy("ap.appointment_id", "asc")
         .limit(itemsPerPage)
         .offset(offset);
@@ -231,7 +233,7 @@ const handleBookingService = {
     }
   },
 
-  // Thanh toán tại phòng khám với phương thức 1
+  // Thanh toán tại phòng khám với phương thức 1: Thanh toán tại phòng khám
   async addTransaction(transactionData) {
     try {
       // Insert dữ liệu vào bảng TRANSACTIONS
