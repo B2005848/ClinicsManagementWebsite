@@ -224,6 +224,10 @@ const handlePatientService = {
         .select(
           "pr.record_id",
           "pr.diagnosis",
+          "pr.doctor_id",
+          "sd.first_name as first_name_doctor",
+          "sd.last_name as last_name_doctor",
+          "pr.appointment_id",
           "pr.treatment",
           "pr.reason",
           "pr.created_at",
@@ -237,6 +241,8 @@ const handlePatientService = {
           "hm.cholesterol"
         )
         .join("HEALTH_METRICS as hm", "hm.record_id", "pr.record_id")
+
+        .join("STAFF_DETAILS as sd", "sd.staff_id", "pr.doctor_id")
         .where("pr.patient_id", patient_id)
         .orderBy("pr.created_at", "desc"); // Sắp xếp theo ngày tạo hồ sơ mới nhất
 
