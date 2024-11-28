@@ -215,6 +215,52 @@ const handlePatientService = {
       };
     }
   },
+
+  // --------------------- GET PATIENT RECORD BY PATIENT ID -------------------
+  async getPatientRecordsByPatientId(patient_id) {
+    try {
+      // Truy vấn bảng PATIENT_RECORDS và liên kết với bảng HEALTH_METRICS
+      const records = await knex("PATIENT_RECORDS as pr")
+        .select(
+          "pr.record_id",
+          "pr.diagnosis",
+          "pr.treatment",
+          "pr.reason",
+          "pr.created_at",
+          "hm.weight",
+          "hm.height",
+          "hm.blood_pressure",
+          "hm.heart_rate",
+          "hm.temperature",
+          "hm.respiratory_rate",
+          "hm.blood_sugar",
+          "hm.cholesterol"
+        )
+        .join("HEALTH_METRICS as hm", "hm.record_id", "pr.record_id")
+        .where("pr.patient_id", patient_id)
+        .orderBy("pr.created_at", "desc"); // Sắp xếp theo ngày tạo hồ sơ mới nhất
+
+      if (records.length > 0) {
+        return {
+          status: true,
+          message: "Patient records found",
+          data: records,
+        };
+      } else {
+        return {
+          status: false,
+          message: "No records found for this patient",
+        };
+      }
+    } catch (error) {
+      console.error("Error retrieving patient records:", error);
+      return {
+        status: false,
+        message: "An error occurred while retrieving patient records",
+        error: error.message,
+      };
+    }
+  },
 };
 
 module.exports = handlePatientService;

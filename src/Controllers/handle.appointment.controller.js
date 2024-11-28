@@ -118,7 +118,6 @@ const handleAppointmentController = {
         payment_method_id,
         payment_status,
         bankCode,
-        transaction_date: new Date(),
       };
 
       // Thêm giao dịch mới vào cơ sở dữ liệu

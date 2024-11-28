@@ -163,6 +163,38 @@ const handlePatientController = {
       });
     }
   },
+
+  // --------------------- GET PATIENT RECORDS BY PATIENT ID -------------------
+  async getPatientRecordsByPatientId(req, res, next) {
+    try {
+      const patient_id = req.params.patient_id; // Lấy patient_id từ tham số URL
+
+      // Gọi service để lấy hồ sơ bệnh án
+      const result = await handlePatientService.getPatientRecordsByPatientId(
+        patient_id
+      );
+
+      // Kiểm tra nếu có dữ liệu
+      if (result.status) {
+        return res.status(200).json({
+          status: 200,
+          message: "Patient records retrieved successfully",
+          data: result.data, // Trả về danh sách hồ sơ bệnh án
+        });
+      } else {
+        // Nếu không tìm thấy hồ sơ bệnh án
+        return res.status(404).json({
+          status: 404,
+          message: result.message, // Trả về thông báo không tìm thấy hồ sơ
+        });
+      }
+    } catch (error) {
+      // Nếu có lỗi trong quá trình xử lý
+      return next(
+        new ApiError(500, "An error occurred while retrieving patient records")
+      );
+    }
+  },
 };
 
 module.exports = handlePatientController;
