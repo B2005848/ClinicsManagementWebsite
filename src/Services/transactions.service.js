@@ -14,12 +14,7 @@ const transactionService = {
               ELSE 0
             END) AS revenue_appointment
           `),
-        knex.raw(`
-            SUM(CASE 
-              WHEN prescription_id IS NOT NULL THEN amount
-              ELSE 0
-            END) AS revenue_prescription
-          `),
+
         knex.raw("SUM(amount) AS total_revenue")
       );
 

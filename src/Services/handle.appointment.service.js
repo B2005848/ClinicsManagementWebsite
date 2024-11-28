@@ -358,7 +358,7 @@ const handleBookingService = {
       // Lấy tổng số lượng lịch hẹn với các điều kiện đã cho
       const totalAppointments = await knex("APPOINTMENTS as ap")
         .join("TRANSACTIONS as t", "t.appointment_id", "ap.appointment_id")
-        .where("ap.status", "CO-F")
+        .where("ap.status", "C-IN")
         .andWhere("t.payment_status", "C")
         .andWhere("ap.staff_id", staff_id) // Thêm điều kiện lọc theo staff_id
         .count("* as totalCount")
@@ -406,7 +406,7 @@ const handleBookingService = {
         .join("DEPARTMENTS as dep", "dep.department_id", "ap.department_id")
         .join("SERVICES as se", "se.service_id", "ap.service_id")
         .join("TRANSACTIONS as t", "t.appointment_id", "ap.appointment_id")
-        .where("ap.status", "CO-F")
+        .where("ap.status", "C-IN")
         .andWhere("t.payment_status", "C")
         .andWhere("ap.staff_id", staff_id) // Lọc theo staff_id
         .orderBy("ap.appointment_id", "asc")
