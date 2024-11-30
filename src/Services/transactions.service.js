@@ -10,28 +10,19 @@ const transactionService = {
       // Xây dựng truy vấn động
       const query = knex("TRANSACTIONS as t")
         .join("APPOINTMENTS as a", "t.appointment_id", "a.appointment_id") // Kết nối với bảng appointments
-        .join("SERVICES as s", "a.service_id", "s.service_id") // Kết nối với bảng services qua bảng appointments
+        .leftJoin("SERVICES as s", "a.service_id", "s.service_id") // Kết nối với bảng services qua bảng appointments
         .select(
-          knex.raw("YEAR(t.transaction_date) AS transaction_year"),
-          knex.raw("MONTH(t.transaction_date) AS transaction_month"),
-          knex.raw("DAY(t.transaction_date) AS transaction_day"),
           knex.raw("s.service_id"),
           knex.raw("s.service_name"),
-          knex.raw(`
-          SUM(CASE 
-            WHEN t.appointment_id IS NOT NULL THEN t.amount
-            ELSE 0
-          END) AS revenue_appointment
-        `),
           knex.raw("SUM(t.amount) AS total_revenue")
         );
 
-      // Lọc trạng thái thanh toán
+      // Lọc trạng thái thanh toán (nếu có)
       if (payment_status) {
         query.andWhere("t.payment_status", payment_status);
       }
 
-      // Áp dụng bộ lọc khoảng thời gian
+      // Áp dụng bộ lọc khoảng thời gian (nếu có)
       if (startDate && endDate) {
         query.andWhereBetween("t.transaction_date", [startDate, endDate]);
       } else if (startDate) {
@@ -40,13 +31,10 @@ const transactionService = {
         query.andWhere("t.transaction_date", "<=", endDate);
       }
 
+      // Nhóm theo dịch vụ và tính tổng doanh thu
       query
-        .groupByRaw(
-          "YEAR(t.transaction_date), MONTH(t.transaction_date), DAY(t.transaction_date), s.service_id, s.service_name"
-        )
-        .orderByRaw(
-          "YEAR(t.transaction_date), MONTH(t.transaction_date), DAY(t.transaction_date), s.service_id"
-        );
+        .groupBy("s.service_id", "s.service_name")
+        .orderBy("total_revenue", "desc"); // Sắp xếp theo tổng doanh thu giảm dần
 
       console.log(query.toString()); // In ra truy vấn SQL để kiểm tra
 
@@ -64,6 +52,7 @@ const transactionService = {
       };
     }
   },
+
   // Lấy lịch sử thanh toán DỊCH VỤ ĐẶT LỊCH HẸN KHÁM BỆNH của bệnh nhân theo năm
   async getPaymentHistoryByAppointment(patientId, year) {
     try {
