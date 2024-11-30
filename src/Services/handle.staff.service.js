@@ -140,7 +140,8 @@ const handleStaffService = {
           this.where("sa.staff_id", "like", `%${query}%`)
             .orWhere("sd.first_name", "like", `%${query}%`)
             .orWhere("sd.last_name", "like", `%${query}%`)
-            .orWhere("sd.citizen_id", "like", `%${query}%`)
+            .orWhere("sd.last_name", "like", `%${query}%`)
+            .orWhere("r.role_name", "like", `%${query}%`)
             .orWhere("sd.email", "like", `%${query}%`)
             .orWhereRaw("CONCAT(sd.first_name, ' ', sd.last_name) LIKE ?", [
               `%${query}%`,
