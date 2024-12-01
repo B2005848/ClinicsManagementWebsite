@@ -23,32 +23,32 @@ const emailService = {
       .select("*")
       .first();
     const mailOptions = {
-      from: "ShineOnYou Customer",
+      from: "B2005848LUANVANTOTNGHIEPCTU",
       to: to,
-      subject: "Verify your phone number(OTP)",
-      text: `Your OTP code is ${otp}`,
+      subject: "Xác minh mã (OTP) của bạn",
+      text: `Mã OTP của bạn là ${otp}`,
       html: `
     <html>
       <body>
-        <h1>Your OTP Code</h1>
-        <p>Thank ${patient.first_name} ${patient.last_name} for using our sevice</p>
-        <p>Your OTP code is <strong>${otp}</strong></p>
-        <p>Expires in  <strong>5 minute</strong></p>
-        <img src="cid:unique@kreata.ee" alt="OTP Image" style="max-width: 100%; height: auto;" />
+        <h1>MÃ OTP CỦA BẠN</h1>
+        <p>Cảm ơn ${patient.first_name} ${patient.last_name} đã sử dụng dịch vụ phòng khám của chúng tôi</p>
+        <p>Mã otp của bạn là <strong>${otp}</strong></p>
+        <p>Hết hạn trong  <strong>5 phút</strong></p>
+        <img src="cid:unique@kreata.ee1" alt="OTP Image" style="max-width: 100%; height: auto;" />
       </body>
     </html>
   `,
       attachments: [
         {
           filename: "image.jpg",
-          path: path.join(__dirname, "../../images/HealthFirst.png"),
+          path: path.join(__dirname, "../../images/CTU_logo.png"),
           // id'src image to src = id
-          cid: "unique@kreata.ee",
+          cid: "unique@kreata.ee1",
         },
       ],
     };
     try {
-      if (patient.patient_id) {
+      if (patient.email === to) {
         const resultSendMail = await transporter.sendMail(mailOptions);
         if (resultSendMail) {
           console.log("OTP email sent successfully");
@@ -80,11 +80,11 @@ const emailService = {
   },
   // -------------------------------check otp by patient_id for patient
 
-  async checkOtpByPatientId(patient_id, otp) {
+  async checkOtpByPatientId(email, otp) {
     try {
       const otpResult = await knex("ACCOUNT_DELETION_PATIENT_OTP")
         .select("otp", "created_at", "expires_in_seconds")
-        .where("patient_id", patient_id)
+        .where("email", email)
         .first();
 
       if (!otpResult) {

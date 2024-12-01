@@ -33,10 +33,10 @@ const emailControllers = {
 
   // -----------------------------------check otp by username
   async checkOtpPatientController(req, res) {
-    const { otp, patient_id } = req.body;
+    const { otp, email } = req.body;
 
     try {
-      const response = await emailService.checkOtpByPatientId(patient_id, otp);
+      const response = await emailService.checkOtpByPatientId(email, otp);
 
       // success == true
       if (response.success) {
