@@ -217,6 +217,7 @@ const accountPatientServices = {
     }
   },
 
+  // Đổi mật khẩu với email
   async changePassword(email, new_password) {
     let transaction;
     try {
@@ -238,6 +239,67 @@ const accountPatientServices = {
       if (!account) {
         await transaction.rollback();
         console.log("Change password failed: account does not exist", email);
+        return {
+          status: false,
+          message: "Account does not exist",
+        };
+      }
+
+      // Update password and salt for the existing account
+      await transaction("PATIENT_ACCOUNTS")
+        .where("patient_id", account.patient_id)
+        .update({
+          password: passwd_hash,
+          salt: salt,
+        });
+
+      // Commit the transaction
+      await transaction.commit();
+
+      console.log(
+        "Password change success for patient_id:",
+        account.patient_id
+      );
+      return {
+        status: true,
+        message: "Password changed successfully",
+      };
+    } catch (error) {
+      // Rollback the transaction in case of error
+      if (transaction) await transaction.rollback();
+
+      console.log("Change password failed", error.message);
+      return {
+        status: false,
+        message: "Change password failed: an error occurred",
+        error: error.message,
+      };
+    }
+  },
+
+  // Đổi mật khẩu khi nhớ mật khẩu cũ
+  async changePasswordOld(patient_id, new_password) {
+    let transaction;
+    try {
+      // Start a new transaction
+      transaction = await knex.transaction();
+
+      // Generate new salt and hash for the password
+      const saltRounds = 10;
+      const salt = await bcrypt.genSalt(saltRounds);
+      const passwd_hash = await bcrypt.hash(new_password, salt);
+
+      // Check if account exists and get patient_id
+      const account = await transaction("PATIENT_ACCOUNTS")
+        .where("patient_id", patient_id)
+        .first();
+
+      if (!account) {
+        await transaction.rollback();
+        console.log(
+          "Change password failed: account does not exist",
+          patient_id
+        );
         return {
           status: false,
           message: "Account does not exist",

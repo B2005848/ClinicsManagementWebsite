@@ -194,7 +194,7 @@ const accountPatientControllers = {
     }
   },
 
-  // ----------------------------------CHANGE PASSWORD----------------------------------------------------------
+  // ----------------------------------CHANGE PASSWORD EMAIL----------------------------------------------------------
   async changePassword(req, res, next) {
     try {
       const patient_id = req.params.id; // Lấy patient_id từ tham số đường dẫn
@@ -247,10 +247,11 @@ const accountPatientControllers = {
       }
 
       // Gọi service để thực hiện đổi mật khẩu
-      const resultChangePassword = await accountPatientServices.changePassword(
-        patient_id,
-        new_password
-      );
+      const resultChangePassword =
+        await accountPatientServices.changePasswordOld(
+          patient_id,
+          new_password
+        );
 
       if (resultChangePassword.status === true) {
         return res.status(200).json({
