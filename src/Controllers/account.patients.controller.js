@@ -232,10 +232,10 @@ const accountPatientControllers = {
 
       // Kiểm tra xem mật khẩu cũ và mật khẩu mới có được cung cấp không
       if (!old_password) {
-        return next(new ApiError(400, "Old password is required"));
+        return next(new ApiError(400, "Vui lòng nhập mật khẩu cũ"));
       }
       if (!new_password) {
-        return next(new ApiError(400, "New password is required"));
+        return next(new ApiError(400, "Vui lòng nhập mật khẩu mới"));
       }
 
       // Kiểm tra mật khẩu cũ có đúng không bằng cách gọi service
@@ -243,7 +243,7 @@ const accountPatientControllers = {
         await accountPatientServices.checkOldPassword(patient_id, old_password);
 
       if (!resultCheckOldPassword.isCorrect) {
-        return next(new ApiError(400, "Old password is incorrect"));
+        return next(new ApiError(400, "Mật khẩu cũ không chính xác"));
       }
 
       // Gọi service để thực hiện đổi mật khẩu
@@ -260,7 +260,7 @@ const accountPatientControllers = {
         return next(new ApiError(400, resultChangePassword.message));
       }
     } catch (error) {
-      return next(new ApiError(500, "Internal Server Error"));
+      return next(new ApiError(500, "Lỗi server"));
     }
   },
 };
