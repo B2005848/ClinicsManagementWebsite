@@ -193,6 +193,76 @@ const accountPatientControllers = {
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
+
+  // ----------------------------------CHANGE PASSWORD----------------------------------------------------------
+  async changePassword(req, res, next) {
+    try {
+      const patient_id = req.params.id; // Lấy patient_id từ tham số đường dẫn
+      const new_password = req.body?.new_password; // Lấy mật khẩu mới từ body
+
+      // Kiểm tra xem mật khẩu mới có tồn tại không
+      if (!new_password) {
+        return next(new ApiError(400, "New password is required"));
+      }
+
+      // Gọi service để xử lý đổi mật khẩu
+      const resultChangePassword = await accountPatientServices.changePassword(
+        patient_id,
+        new_password
+      );
+
+      // Kiểm tra kết quả trả về từ service
+      if (resultChangePassword.status === true) {
+        return res.status(200).json({
+          message: resultChangePassword.message,
+        });
+      } else {
+        return next(new ApiError(400, resultChangePassword.message));
+      }
+    } catch (error) {
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
+
+  // ----------------------------------CHANGE PASSWORD WITH OLD PASSWORD----------------------------------------------------------
+  async changePasswordWithOldPassword(req, res, next) {
+    try {
+      const patient_id = req.params.id; // Lấy patient_id từ tham số đường dẫn
+      const { old_password, new_password } = req.body; // Lấy mật khẩu cũ và mật khẩu mới từ body
+
+      // Kiểm tra xem mật khẩu cũ và mật khẩu mới có được cung cấp không
+      if (!old_password) {
+        return next(new ApiError(400, "Old password is required"));
+      }
+      if (!new_password) {
+        return next(new ApiError(400, "New password is required"));
+      }
+
+      // Kiểm tra mật khẩu cũ có đúng không bằng cách gọi service
+      const resultCheckOldPassword =
+        await accountPatientServices.checkOldPassword(patient_id, old_password);
+
+      if (!resultCheckOldPassword.isCorrect) {
+        return next(new ApiError(400, "Old password is incorrect"));
+      }
+
+      // Gọi service để thực hiện đổi mật khẩu
+      const resultChangePassword = await accountPatientServices.changePassword(
+        patient_id,
+        new_password
+      );
+
+      if (resultChangePassword.status === true) {
+        return res.status(200).json({
+          message: resultChangePassword.message,
+        });
+      } else {
+        return next(new ApiError(400, resultChangePassword.message));
+      }
+    } catch (error) {
+      return next(new ApiError(500, "Internal Server Error"));
+    }
+  },
 };
 
 module.exports = accountPatientControllers;

@@ -216,6 +216,75 @@ const accountPatientServices = {
       throw error;
     }
   },
+
+  async changePassword(patient_id, new_password) {
+    let transaction;
+    try {
+      transaction = await knex.transaction();
+
+      // Generate new salt and hash for the password
+      const saltRounds = 10;
+      const salt = await bcrypt.genSalt(saltRounds);
+      const passwd_hash = await bcrypt.hash(new_password, salt);
+
+      // Check if account exists
+      const account = await transaction("PATIENT_ACCOUNTS")
+        .where("patient_id", patient_id)
+        .first();
+
+      if (!account) {
+        await transaction.rollback();
+        console.log("Change password fail: account does not exist", patient_id);
+        return {
+          status: false,
+          message: "Account does not exist",
+        };
+      }
+
+      // Update password and salt for the existing account
+      await transaction("PATIENT_ACCOUNTS")
+        .where("patient_id", patient_id)
+        .update({
+          password: passwd_hash,
+          salt: salt,
+        });
+
+      // Commit the transaction
+      await transaction.commit();
+
+      console.log("Password change success", patient_id);
+      return {
+        status: true,
+        message: "Password changed successfully",
+      };
+    } catch (error) {
+      if (transaction) await transaction.rollback();
+      console.log("Change password fail", error);
+      return {
+        status: false,
+        message: "Change password failed: an error occurred",
+        error: error.message,
+      };
+    }
+  },
+
+  // Service - Kiểm tra mật khẩu cũ
+  async checkOldPassword(patient_id, old_password) {
+    try {
+      const account = await knex("PATIENT_ACCOUNTS")
+        .where("patient_id", patient_id)
+        .first();
+      if (!account) {
+        return { isCorrect: false };
+      }
+
+      // So sánh mật khẩu cũ với mật khẩu đã hash trong cơ sở dữ liệu
+      const isMatch = await bcrypt.compare(old_password, account.password);
+      return { isCorrect: isMatch };
+    } catch (error) {
+      throw new Error("Error checking old password");
+    }
+  },
 };
 
 // Export đối tượng chứa các hàm

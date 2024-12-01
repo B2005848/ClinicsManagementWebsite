@@ -25,4 +25,13 @@ router.post(
 );
 
 router.put("/status/update/:id", accountPatientControllers.updateStatusAccount);
+
+// Quên mật khẩu ( Khôi phục tài khoản)
+router.put("/change-password/:id", accountPatientControllers.changePassword);
+
+// Route đổi mật khẩu với điều kiện nhập mật khẩu cũ
+router.put(
+  "/change-password-with-old/:id",
+  accountPatientControllers.changePasswordWithOldPassword
+);
 module.exports = router;
