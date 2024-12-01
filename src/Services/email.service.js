@@ -48,7 +48,7 @@ const emailService = {
       ],
     };
     try {
-      if (patient.email === to) {
+      if (patient.email) {
         const resultSendMail = await transporter.sendMail(mailOptions);
         if (resultSendMail) {
           console.log("OTP email sent successfully");

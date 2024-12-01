@@ -217,9 +217,10 @@ const accountPatientServices = {
     }
   },
 
-  async changePassword(patient_id, new_password) {
+  async changePassword(email, new_password) {
     let transaction;
     try {
+      // Start a new transaction
       transaction = await knex.transaction();
 
       // Generate new salt and hash for the password
@@ -227,14 +228,16 @@ const accountPatientServices = {
       const salt = await bcrypt.genSalt(saltRounds);
       const passwd_hash = await bcrypt.hash(new_password, salt);
 
-      // Check if account exists
-      const account = await transaction("PATIENT_ACCOUNTS")
-        .where("patient_id", patient_id)
+      // Check if account exists and get patient_id
+      const account = await transaction("PATIENT_ACCOUNTS as pa")
+        .select("pa.patient_id")
+        .join("PATIENT_DETAILS as pd", "pa.patient_id", "pd.patient_id")
+        .where("pd.email", email)
         .first();
 
       if (!account) {
         await transaction.rollback();
-        console.log("Change password fail: account does not exist", patient_id);
+        console.log("Change password failed: account does not exist", email);
         return {
           status: false,
           message: "Account does not exist",
@@ -243,7 +246,7 @@ const accountPatientServices = {
 
       // Update password and salt for the existing account
       await transaction("PATIENT_ACCOUNTS")
-        .where("patient_id", patient_id)
+        .where("patient_id", account.patient_id)
         .update({
           password: passwd_hash,
           salt: salt,
@@ -252,14 +255,19 @@ const accountPatientServices = {
       // Commit the transaction
       await transaction.commit();
 
-      console.log("Password change success", patient_id);
+      console.log(
+        "Password change success for patient_id:",
+        account.patient_id
+      );
       return {
         status: true,
         message: "Password changed successfully",
       };
     } catch (error) {
+      // Rollback the transaction in case of error
       if (transaction) await transaction.rollback();
-      console.log("Change password fail", error);
+
+      console.log("Change password failed", error.message);
       return {
         status: false,
         message: "Change password failed: an error occurred",
