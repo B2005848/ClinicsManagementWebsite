@@ -355,6 +355,28 @@ const accountPatientServices = {
       throw new Error("Error checking old password");
     }
   },
+
+  // Check tài khoản bệnh nhân có tồn tại để đặt lịch khám hay không
+  async checkAccountExisting(patient_id) {
+    try {
+      const account = await knex("PATIENT_ACCOUNTS")
+        .where("patient_id", patient_id)
+        .first();
+      if (!account) {
+        return {
+          status: false,
+          message: "Account doesn't existing",
+        };
+      } else {
+        return {
+          status: true,
+          message: "Account existing",
+        };
+      }
+    } catch (error) {
+      throw new Error("Lỗi server");
+    }
+  },
 };
 
 // Export đối tượng chứa các hàm

@@ -34,4 +34,10 @@ router.put(
   "/change-password-with-old/:id",
   accountPatientControllers.changePasswordWithOldPassword
 );
+
+// kiểm tra tài khoản tồn tại hay không? để đặt lịch theo mã
+router.post(
+  "/check-account-existing",
+  accountPatientControllers.checkAccountExisting
+);
 module.exports = router;

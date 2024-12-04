@@ -264,6 +264,23 @@ const accountPatientControllers = {
       return next(new ApiError(500, "Lỗi server"));
     }
   },
+
+  async checkAccountExisting(req, res, next) {
+    try {
+      const patient_id = req.body.patient_id;
+      const result = await accountPatientServices.checkAccountExisting(
+        patient_id
+      );
+      if (result.status === true) {
+        return res.status(200).json({ message: result.message });
+      } else {
+        return res.status(400).json({ message: result.message });
+      }
+    } catch (error) {
+      console.error(error);
+      return next(new ApiError(500, "Lỗi server"));
+    }
+  },
 };
 
 module.exports = accountPatientControllers;
