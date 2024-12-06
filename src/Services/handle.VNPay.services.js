@@ -10,6 +10,7 @@ const {
   VNP_URL,
   VNP_RETURNURL,
   VNP_RETURNURL_WEB,
+  VNP_RETURNURL_WEBRE,
 } = process.env;
 
 // console.log("VNP_TMNCODE:", process.env.VNP_TMNCODE);
@@ -117,7 +118,7 @@ const handleVNPAYServices = {
     return paymentUrl;
   },
 
-  // ==================================TẠO URL THANH TOÁN VNPAY WEB
+  // ==================================TẠO URL THANH TOÁN VNPAY WEB admin
   async createVNPayPaymentForWeb(
     amount,
     bankCode,
@@ -170,6 +171,93 @@ const handleVNPAYServices = {
       vnp_OrderType: "billpayment",
       vnp_Locale: "vn",
       vnp_ReturnUrl: VNP_RETURNURL_WEB, // Lấy giá trị từ process.env
+      vnp_IpAddr: ipAddr,
+      vnp_CreateDate: vnp_CreateDate,
+    };
+
+    if (bankCode) {
+      vnp_Params["vnp_BankCode"] = bankCode;
+    }
+
+    delete vnp_Params["vnp_SecureHash"];
+    delete vnp_Params["vnp_SecureHashType"];
+
+    // Sắp xếp các tham số theo thứ tự bảng chữ cái
+    vnp_Params = this.sortObject(vnp_Params);
+
+    // In tham số đã sắp xếp để kiểm tra
+    console.log("Sorted Params:", vnp_Params);
+
+    // Tạo chữ ký cho yêu cầu thanh toán
+    const signData = querystring.stringify(vnp_Params);
+    console.log("Tham số tạo chữ ký:", signData); // Kiểm tra dữ liệu trước khi tạo chữ ký
+
+    const hmac = crypto.createHmac("sha512", VNP_HASHSECRET);
+    const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
+    console.log("Signed Hash:", signed); // Kiểm tra chữ ký được tạo
+
+    vnp_Params["vnp_SecureHash"] = signed;
+
+    // Tạo URL chuyển hướng người dùng sang VNPay
+    const paymentUrl = `${VNP_URL}?${querystring.stringify(vnp_Params)}`;
+    console.log("Final Payment URL:", paymentUrl); // Kiểm tra URL thanh toán đầy đủ
+
+    return paymentUrl;
+  },
+
+  // ==================================TẠO URL THANH TOÁN VNPAY WEB LỄ TÂN
+  async createVNPayPaymentForWebRe(
+    amount,
+    bankCode,
+    ipAddr,
+    patient_id,
+    appointment_id
+  ) {
+    const date = new Date();
+
+    // Tạo giao dịch và lấy transaction_id từ SQL Server
+    let transaction_id;
+    try {
+      const [transaction] = await knex("TRANSACTIONS")
+        .insert({
+          patient_id,
+          appointment_id,
+          payment_method_id: 2,
+          bankCode,
+          amount,
+          payment_status: "P", // P: Pending
+        })
+        .returning("transaction_id");
+
+      transaction_id = transaction.transaction_id;
+    } catch (error) {
+      console.error("Error inserting appointment transaction:", error);
+      throw new Error("Error creating appointment transaction");
+    }
+
+    // Tạo các tham số VNPay
+    const vnp_TxnRef = String(transaction_id); // Đảm bảo vnp_TxnRef là chuỗi
+    const vnp_OrderInfo = `Thanh-toan-lich-hen-${appointment_id}`;
+    const vnp_CreateDate = `${date.getFullYear()}${(
+      "0" +
+      (date.getMonth() + 1)
+    ).slice(-2)}${("0" + date.getDate()).slice(-2)}${(
+      "0" + date.getHours()
+    ).slice(-2)}${("0" + date.getMinutes()).slice(-2)}${(
+      "0" + date.getSeconds()
+    ).slice(-2)}`;
+
+    let vnp_Params = {
+      vnp_Version: "2.1.0",
+      vnp_Command: "pay",
+      vnp_TmnCode: VNP_TMNCODE, // Lấy giá trị từ process.env
+      vnp_Amount: amount * 100, // VNPay yêu cầu số tiền nhân với 100
+      vnp_CurrCode: "VND",
+      vnp_TxnRef: vnp_TxnRef,
+      vnp_OrderInfo: vnp_OrderInfo,
+      vnp_OrderType: "billpayment",
+      vnp_Locale: "vn",
+      vnp_ReturnUrl: VNP_RETURNURL_WEBRE, // Lấy giá trị từ process.env
       vnp_IpAddr: ipAddr,
       vnp_CreateDate: vnp_CreateDate,
     };
@@ -340,6 +428,43 @@ const handleVNPAYServices = {
             payment_status: status,
           });
         const redirectUrl = `http://localhost:3002/#/admin/booking_managements?status=success&transactionId=${query.vnp_TxnRef}`;
+        return {
+          code: "00",
+          message: "Transaction successfully processed",
+          redirectUrl,
+        };
+      } catch (error) {
+        console.error("Error updating transaction:", error);
+        throw new Error("Error updating transaction status");
+      }
+    } else {
+      return { code: "97", message: "Checksum failed" };
+    }
+  },
+
+  // Xử lí trả về cho lễ tân
+  async handleVNPayReturnUrlWebRe(query) {
+    const secureHash = query.vnp_SecureHash;
+    delete query.vnp_SecureHash;
+    delete query.vnp_SecureHashType;
+
+    query = this.sortObject(query);
+    const signData = querystring.stringify(query);
+    const hmac = crypto.createHmac("sha512", VNP_HASHSECRET);
+    const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
+
+    if (secureHash === signed) {
+      // Xác thực thành công
+      const status = query.vnp_ResponseCode === "00" ? "C" : "F"; // 'C' là Complete (hoàn tất), 'F' là Failed (thất bại)
+
+      try {
+        // Cập nhật trạng thái thanh toán trong SQL Server qua Knex
+        await knex("TRANSACTIONS")
+          .where({ transaction_id: query.vnp_TxnRef }) // Sử dụng transaction_id để xác định giao dịch
+          .update({
+            payment_status: status,
+          });
+        const redirectUrl = `http://localhost:3006/#/recep/nguyenvannhuan/appointment_managements?status=success&transactionId=${query.vnp_TxnRef}`;
         return {
           code: "00",
           message: "Transaction successfully processed",

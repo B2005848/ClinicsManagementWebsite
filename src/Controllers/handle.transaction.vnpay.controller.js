@@ -24,13 +24,34 @@ const paymentVNPayController = {
     }
   },
 
-  // Thanh toán vnpay web
+  // Thanh toán vnpay web admin
   async createVNPayPaymentForWeb(req, res, next) {
     try {
       const { amount, bankCode, ipAddr, patient_id, appointment_id } = req.body;
 
       // Gọi service để tạo URL thanh toán
       const paymentUrl = await handleVNPAYServices.createVNPayPaymentForWeb(
+        amount,
+        bankCode,
+        ipAddr,
+        patient_id,
+        appointment_id
+      );
+
+      // Trả về URL thanh toán cho client
+      res.status(200).json({ code: "00", message: "Success", paymentUrl });
+    } catch (error) {
+      next(new ApiError(400, "Error creating VNPay payment for appointment"));
+    }
+  },
+
+  // Thanh toán vnpay web lễ tân
+  async createVNPayPaymentForWebRe(req, res, next) {
+    try {
+      const { amount, bankCode, ipAddr, patient_id, appointment_id } = req.body;
+
+      // Gọi service để tạo URL thanh toán
+      const paymentUrl = await handleVNPAYServices.createVNPayPaymentForWebRe(
         amount,
         bankCode,
         ipAddr,
@@ -90,13 +111,31 @@ const paymentVNPayController = {
     }
   },
 
-  // -------------------------- Xử lý kết quả trả về từ VNPay Web -----------------------------
+  // -------------------------- Xử lý kết quả trả về từ VNPay Web Adnin-----------------------------
   async handleVNPayReturnUrlWeb(req, res, next) {
     try {
       const query = req.query;
       console.log(query);
       // Gọi service để xử lý kết quả trả về từ VNPay
       const result = await handleVNPAYServices.handleVNPayReturnUrlWeb(query);
+      if (result.code == "00") {
+        res.redirect(result.redirectUrl);
+      } else {
+        res.status(400).json({ code: "97", message: "THẤT BẠI" });
+      }
+      // Trả về kết quả cho client
+    } catch (error) {
+      next(new ApiError(400, "Error handling VNPay return"));
+    }
+  },
+
+  // -------------------------- Xử lý kết quả trả về từ VNPay Web Lễ Tân-----------------------------
+  async handleVNPayReturnUrlWebRe(req, res, next) {
+    try {
+      const query = req.query;
+      console.log(query);
+      // Gọi service để xử lý kết quả trả về từ VNPay
+      const result = await handleVNPAYServices.handleVNPayReturnUrlWebRe(query);
       if (result.code == "00") {
         res.redirect(result.redirectUrl);
       } else {
