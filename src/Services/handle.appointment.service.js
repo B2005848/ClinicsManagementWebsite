@@ -166,42 +166,10 @@ const handleBookingService = {
 
       // If appointment exists, delete it and proceed with new booking
       if (existingAppointment) {
-        // Delete the existing conflicting appointment
-        await knex("APPOINTMENTS")
-          .where("staff_id", bookingData.staff_id)
-          .andWhere("appointment_date", bookingData.appointment_date)
-          .andWhere(function () {
-            this.where(function () {
-              this.where("start_time", "<", bookingData.end_time).andWhere(
-                "end_time",
-                ">",
-                bookingData.start_time
-              );
-            });
-          })
-          .del();
-
-        // After deletion, proceed with inserting the new booking
-        const [resultBooking] = await knex("APPOINTMENTS")
-          .insert(bookingData)
-          .returning("appointment_id");
-
-        if (resultBooking) {
-          console.log(
-            `Booking ID: ${resultBooking} has been successfully booked`,
-            [resultBooking]
-          );
-          return {
-            status: true,
-            message: "Booking Successful",
-            data: resultBooking,
-          };
-        } else {
-          return {
-            status: false,
-            message: "Booking failed",
-          };
-        }
+        return {
+          status: false,
+          message: "Booking fails check time existing",
+        };
       } else {
         // If no conflict, directly insert the new booking
         const [resultBooking] = await knex("APPOINTMENTS")
@@ -320,25 +288,19 @@ const handleBookingService = {
   // Xóa lịch hẹn
   async deleteAppointment(appointment_id) {
     try {
-      const deletedTransaction = await knex("TRANSACTIONS")
+      const deletedCount = await knex("APPOINTMENTS")
         .where("appointment_id", appointment_id)
         .del();
-
-      if (deletedTransaction > 0) {
-        const deletedCount = await knex("APPOINTMENTS")
-          .where("appointment_id", appointment_id)
-          .del();
-        if (deletedCount > 0) {
-          return {
-            status: true,
-            message: "Appointment deleted successfully",
-          };
-        } else {
-          return {
-            status: false,
-            message: "Appointment not found or could not be deleted",
-          };
-        }
+      if (deletedCount > 0) {
+        return {
+          status: true,
+          message: "Appointment deleted successfully",
+        };
+      } else {
+        return {
+          status: false,
+          message: "Appointment not found or could not be deleted",
+        };
       }
     } catch (error) {
       console.error("Error while deleting appointment:", error);

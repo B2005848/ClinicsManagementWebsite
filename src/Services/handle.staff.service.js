@@ -185,6 +185,7 @@ const handleStaffService = {
         .join("STAFF_ACCOUNTS as sa", "sa.staff_id", "sp.staff_id")
         .join("STAFF_DETAILS as sd", "sd.staff_id", "sp.staff_id")
         .where("sa.role_id", "BS")
+        .whereNot("sa.status", 0)
         .andWhere("sp.specialty_id", specialty_id);
 
       if (doctorInfo.length > 0) {

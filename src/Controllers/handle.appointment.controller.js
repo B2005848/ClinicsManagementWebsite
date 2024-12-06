@@ -77,12 +77,12 @@ const handleAppointmentController = {
         bookingData
       );
       if (result.status === true) {
-        res.json({
+        res.status(200).json({
           message: result.message,
           data: result.data,
         });
       } else {
-        res.json({
+        res.status(400).json({
           message: result.message,
         });
       }
@@ -215,6 +215,7 @@ const handleAppointmentController = {
         });
       }
     } catch (error) {
+      console.error("", error);
       return next(new ApiError(500, "Internal Server Error"));
     }
   },
