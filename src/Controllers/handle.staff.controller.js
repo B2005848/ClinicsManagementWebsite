@@ -200,6 +200,7 @@ const handleStaffController = {
         religion,
         nationality,
         status,
+        role_id,
       } = req.body;
 
       const infoBasicData = {
@@ -215,7 +216,7 @@ const handleStaffController = {
         nationality,
       };
 
-      const accountInfo = { status };
+      const accountInfo = { status, role_id };
 
       const result = await handleStaffService.updateStaffInfo(
         staff_id,
