@@ -311,7 +311,7 @@ const handleBookingService = {
     }
   },
 
-  // Lọc danh sách lịch hẹn có status = 'CO-F', payment_status = 'C' và theo staff_id
+  // Lọc danh sách lịch hẹn có status = 'CO-F', payment_status = 'C' và theo staff_id : danh cho bac si
   async getAppointmentsWithStatusPaymentAndStaff(page, staff_id) {
     try {
       const itemsPerPage = 10; // Số lượng lịch hẹn trên mỗi trang
