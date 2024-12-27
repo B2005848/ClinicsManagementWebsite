@@ -139,7 +139,7 @@ const accountPatientServices = {
           patient_id: decoded.patient_id,
           username: decoded.username,
         },
-        process.env.JWT_SECRET,
+        process.env.JWT_SECRET_PA,
         {
           expiresIn: "120m",
         }
